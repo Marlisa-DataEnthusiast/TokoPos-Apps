@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HR Kit UMKM — Slip Gaji & Absensi</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f7f8fc;--surface:#fff;--surface2:#f0f2f9;--surface3:#e4e8f5;
+  --border:#e2e6f3;--border2:#c8cfe8;
+  --text:#1a1d2e;--text2:#5a6080;--text3:#9da5c0;
+  --acc:#3b5bdb;--acc2:#748ffc;--acc3:#dbe4ff;
+  --green:#0ca678;--green2:#63e6be;--green3:#d3f9d8;
+  --red:#f03e3e;--red2:#ffc9c9;
+  --gold:#f59f00;--gold2:#ffec99;
+  --orange:#e8590c;
+  --r:14px;--r-sm:9px;
+  --shadow:0 2px 12px rgba(59,91,219,.08);
+  --shadow2:0 8px 32px rgba(59,91,219,.12);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+button{font-family:inherit;cursor:pointer;border:none;outline:none;}
+input,select,textarea{font-family:inherit;outline:none;border:none;background:none;}
+::-webkit-scrollbar{width:5px;} ::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:99px;}
+
+/* ── LAYOUT ── */
+.app{max-width:980px;margin:0 auto;padding:0 16px 80px;}
+
+/* ── TOPBAR ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:20px 0 4px;flex-wrap:wrap;gap:12px;}
+.brand{display:flex;align-items:center;gap:11px;}
+.brand-logo{width:42px;height:42px;border-radius:12px;background:linear-gradient(135deg,var(--acc),#364fc7);
+  display:flex;align-items:center;justify-content:center;font-size:1.2rem;
+  box-shadow:0 4px 14px rgba(59,91,219,.3);}
+.brand-name{font-family:'Instrument Serif',serif;font-size:1.4rem;font-style:italic;color:var(--acc);}
+.brand-sub{font-size:.65rem;color:var(--text3);font-weight:600;letter-spacing:.5px;text-transform:uppercase;}
+
+/* ── COMPANY SETUP BAR ── */
+.company-bar{
+  background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:12px 16px;margin:14px 0;display:flex;align-items:center;gap:14px;
+  box-shadow:var(--shadow);flex-wrap:wrap;
+}
+.company-logo-preview{
+  width:48px;height:48px;border-radius:10px;border:2px dashed var(--border2);
+  display:flex;align-items:center;justify-content:center;font-size:.65rem;
+  color:var(--text3);cursor:pointer;overflow:hidden;flex-shrink:0;background:var(--surface2);
+  transition:border-color .2s;
+}
+.company-logo-preview:hover{border-color:var(--acc);}
+.company-logo-preview img{width:100%;height:100%;object-fit:contain;}
+.company-info{flex:1;min-width:160px;}
+.company-name-display{font-weight:800;font-size:.95rem;color:var(--text);}
+.company-sub-display{font-size:.72rem;color:var(--text3);margin-top:1px;}
+
+/* ── NAV ── */
+.nav{display:flex;gap:4px;background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r);padding:4px;margin-bottom:20px;box-shadow:var(--shadow);flex-wrap:wrap;}
+.nb{font-size:.8rem;font-weight:700;padding:8px 18px;border-radius:10px;border:none;
+  background:none;color:var(--text2);cursor:pointer;transition:all .18s;
+  display:flex;align-items:center;gap:6px;white-space:nowrap;}
+.nb:hover{background:var(--surface2);color:var(--text);}
+.nb.active{background:linear-gradient(135deg,var(--acc),#364fc7);color:#fff;
+  box-shadow:0 3px 10px rgba(59,91,219,.3);}
+
+/* ── PAGES ── */
+.page{display:none;}
+.page.active{display:block;animation:fadeUp .25s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── SECTION HEADER ── */
+.sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;flex-wrap:wrap;gap:10px;}
+.sh-title{font-family:'Instrument Serif',serif;font-size:1.3rem;font-style:italic;color:var(--text);}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:18px;margin-bottom:14px;box-shadow:var(--shadow);}
+.card-title{font-size:.72rem;font-weight:800;color:var(--text3);letter-spacing:1.2px;
+  text-transform:uppercase;margin-bottom:14px;display:flex;align-items:center;gap:7px;}
+.card-title::before{content:'';display:block;width:3px;height:13px;border-radius:2px;
+  background:linear-gradient(var(--acc),var(--acc2));}
+
+/* ── STATS ── */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:18px;}
+.stat{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:14px 16px;box-shadow:var(--shadow);}
+.stat-val{font-family:'JetBrains Mono',monospace;font-size:1.4rem;font-weight:500;line-height:1;margin-bottom:3px;}
+.stat-lbl{font-size:.6rem;font-weight:700;color:var(--text3);letter-spacing:1px;text-transform:uppercase;}
+
+/* ── EMPLOYEE CARDS ── */
+.emp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;}
+.emp-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);
+  padding:16px;box-shadow:var(--shadow);transition:all .18s;position:relative;}
+.emp-card:hover{border-color:var(--border2);box-shadow:var(--shadow2);transform:translateY(-2px);}
+.emp-avatar{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;
+  justify-content:center;font-weight:800;font-size:1rem;margin-bottom:10px;color:#fff;}
+.emp-name{font-weight:800;font-size:.92rem;margin-bottom:2px;}
+.emp-role{font-size:.72rem;color:var(--text2);margin-bottom:8px;}
+.emp-salary{font-family:'JetBrains Mono',monospace;font-size:.82rem;color:var(--green);font-weight:500;}
+.emp-actions{display:flex;gap:6px;margin-top:10px;}
+
+/* ── FORM ── */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:11px;}
+.ff{grid-column:1/-1;}
+.field label{display:block;font-size:.62rem;font-weight:800;color:var(--text2);
+  letter-spacing:.8px;text-transform:uppercase;margin-bottom:4px;}
+.field input,.field select,.field textarea{
+  width:100%;background:var(--surface2);border:1.5px solid var(--border);
+  border-radius:var(--r-sm);padding:9px 12px;color:var(--text);
+  font-size:.86rem;font-weight:500;transition:border-color .18s;}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--acc);
+  box-shadow:0 0 0 3px rgba(59,91,219,.1);}
+.field select option{background:var(--surface);}
+
+/* ── BUTTONS ── */
+.btn{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:.82rem;
+  border-radius:var(--r-sm);padding:9px 18px;transition:all .18s;
+  display:inline-flex;align-items:center;gap:6px;cursor:pointer;}
+.bp{background:linear-gradient(135deg,var(--acc),#364fc7);color:#fff;
+  box-shadow:0 3px 12px rgba(59,91,219,.25);}
+.bp:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(59,91,219,.35);}
+.bg2{background:var(--surface2);color:var(--text);border:1.5px solid var(--border);}
+.bg2:hover{border-color:var(--border2);}
+.bd{background:var(--red2);color:var(--red);border:1.5px solid #ffa8a8;}
+.bd:hover{background:#ffb3b3;}
+.bgreen{background:var(--green3);color:var(--green);border:1.5px solid #b2f2d2;}
+.bgreen:hover{background:#c3f5de;}
+.bsm{padding:5px 11px;font-size:.73rem;}
+.bxs{padding:3px 8px;font-size:.67rem;}
+
+/* ── ATTENDANCE TABLE ── */
+.att-wrap{overflow-x:auto;}
+table.att{width:100%;border-collapse:collapse;font-size:.78rem;min-width:600px;}
+table.att th{font-size:.58rem;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;
+  color:var(--text3);padding:8px 10px;text-align:left;border-bottom:2px solid var(--border);}
+table.att td{padding:9px 10px;border-bottom:1px solid var(--border);vertical-align:middle;}
+table.att tr:last-child td{border-bottom:none;}
+table.att tr:hover td{background:var(--surface2);}
+.att-cell{text-align:center;}
+.att-btn{width:32px;height:28px;border-radius:6px;font-size:.72rem;font-weight:700;
+  cursor:pointer;border:1.5px solid var(--border);transition:all .15s;background:var(--surface);}
+.att-btn:hover{transform:scale(1.08);}
+.att-H{background:#d3f9d8;color:#0ca678;border-color:#b2f2d2;}
+.att-I{background:#fff3bf;color:#e67700;border-color:#ffe066;}
+.att-S{background:#ffe8cc;color:#e8590c;border-color:#ffd8a8;}
+.att-A{background:#ffc9c9;color:#f03e3e;border-color:#ffa8a8;}
+.att-L{background:#dbe4ff;color:#3b5bdb;border-color:#bac8ff;}
+
+/* ── SLIP GAJI PREVIEW ── */
+.slip-preview{background:#fff;border:1px solid #e0e0e0;border-radius:12px;
+  padding:28px;font-family:'Plus Jakarta Sans',sans-serif;color:#1a1a2e;
+  box-shadow:0 4px 24px rgba(0,0,0,.08);}
+.slip-header{display:flex;justify-content:space-between;align-items:flex-start;
+  padding-bottom:16px;border-bottom:2px solid #1a1d2e;margin-bottom:16px;}
+.slip-company-logo{width:52px;height:52px;border-radius:8px;object-fit:contain;}
+.slip-company-name{font-weight:800;font-size:1.05rem;color:#1a1d2e;}
+.slip-company-sub{font-size:.72rem;color:#666;margin-top:2px;}
+.slip-title{text-align:right;}
+.slip-title-text{font-size:1rem;font-weight:800;color:#3b5bdb;letter-spacing:1px;text-transform:uppercase;}
+.slip-period{font-size:.72rem;color:#666;margin-top:3px;}
+.slip-emp{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:16px;
+  background:#f7f8fc;border-radius:8px;padding:12px;}
+.slip-emp-row{font-size:.78rem;display:flex;gap:6px;}
+.slip-emp-lbl{color:#666;min-width:90px;}
+.slip-emp-val{font-weight:700;color:#1a1d2e;}
+.slip-table{width:100%;border-collapse:collapse;margin-bottom:14px;font-size:.8rem;}
+.slip-table th{background:#f0f2f9;padding:7px 10px;text-align:left;font-size:.65rem;
+  font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#5a6080;}
+.slip-table td{padding:8px 10px;border-bottom:1px solid #eee;}
+.slip-table tr:last-child td{border-bottom:none;}
+.slip-table td.right{text-align:right;font-family:'JetBrains Mono',monospace;font-size:.76rem;}
+.slip-total-row{background:#f0f2f9;}
+.slip-total-row td{font-weight:800;font-size:.84rem;padding:10px;}
+.slip-net{background:linear-gradient(135deg,#3b5bdb,#364fc7);border-radius:10px;
+  padding:14px 16px;display:flex;justify-content:space-between;align-items:center;
+  color:#fff;margin-top:14px;}
+.slip-net-lbl{font-weight:700;font-size:.84rem;}
+.slip-net-val{font-family:'JetBrains Mono',monospace;font-size:1.15rem;font-weight:500;}
+.slip-footer{margin-top:16px;padding-top:14px;border-top:1px solid #eee;
+  display:flex;justify-content:space-between;font-size:.72rem;color:#999;}
+.slip-sign{text-align:center;}
+.slip-sign-line{width:100px;height:1px;background:#999;margin:28px auto 4px;}
+
+/* ── BADGE ── */
+.badge{display:inline-flex;align-items:center;font-size:.62rem;font-weight:800;
+  padding:2px 9px;border-radius:50px;gap:3px;}
+.badge-green{background:var(--green3);color:var(--green);}
+.badge-red{background:var(--red2);color:var(--red);}
+.badge-gold{background:var(--gold2);color:#946800;}
+.badge-blue{background:var(--acc3);color:var(--acc);}
+
+/* ── MODAL ── */
+.mo{display:none;position:fixed;inset:0;z-index:200;background:rgba(26,29,46,.6);
+  backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px;}
+.mo.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:18px;
+  padding:24px;width:100%;max-width:500px;max-height:90vh;overflow-y:auto;
+  box-shadow:0 24px 60px rgba(26,29,46,.2);animation:mi .22s cubic-bezier(.34,1.56,.64,1);}
+@keyframes mi{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:scale(1)}}
+.modal.wide{max-width:680px;}
+.mh{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.mt{font-family:'Instrument Serif',serif;font-size:1.15rem;font-style:italic;}
+.mc{background:var(--surface2);border:1px solid var(--border);border-radius:7px;
+  padding:4px 10px;color:var(--text2);font-size:.82rem;cursor:pointer;}
+.mc:hover{color:var(--text);}
+
+/* ── CONFIRM ── */
+.cfmo{display:none;position:fixed;inset:0;z-index:9999;background:rgba(26,29,46,.6);
+  backdrop-filter:blur(8px);align-items:center;justify-content:center;padding:16px;}
+.cfmo.open{display:flex;}
+.cfmb{background:var(--surface);border:1px solid var(--border2);border-radius:16px;
+  padding:24px;max-width:300px;width:100%;text-align:center;
+  box-shadow:0 24px 60px rgba(26,29,46,.2);animation:mi .22s cubic-bezier(.34,1.56,.64,1);}
+
+/* ── EMPTY ── */
+.empty{text-align:center;padding:36px 16px;color:var(--text3);}
+.empty .ico{font-size:2.2rem;margin-bottom:8px;}
+.empty p{font-size:.82rem;line-height:1.6;}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:22px;right:22px;z-index:9999;
+  padding:11px 18px;border-radius:11px;font-size:.8rem;font-weight:700;
+  animation:ti .25s ease;box-shadow:0 8px 24px rgba(26,29,46,.15);}
+.toast.success{background:linear-gradient(135deg,#0ca678,#63e6be);color:#fff;}
+.toast.error{background:linear-gradient(135deg,#e03131,#f87171);color:#fff;}
+.toast.info{background:linear-gradient(135deg,var(--acc),#364fc7);color:#fff;}
+@keyframes ti{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+@media(max-width:620px){
+  .stats{grid-template-columns:1fr 1fr;}
+  .fg{grid-template-columns:1fr;}
+  .nb span.lbl{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="brand">
+    <div class="brand-logo">👔</div>
+    <div>
+      <div class="brand-name">HR Kit UMKM</div>
+      <div class="brand-sub">Slip Gaji & Absensi</div>
+    </div>
+  </div>
+  <button class="btn bp bsm" onclick="nav('karyawan',null);openEmpModal()">＋ Tambah Karyawan</button>
+</div>
+
+<!-- COMPANY BAR -->
+<div class="company-bar">
+  <div class="company-logo-preview" id="logoPreview" onclick="document.getElementById('logoInput').click()" title="Klik untuk upload logo">
+    <input type="file" id="logoInput" accept="image/*" style="display:none;">
+    <span id="logoPlaceholder" style="text-align:center;line-height:1.3;">🏢<br>Logo</span>
+  </div>
+  <div class="company-info">
+    <div class="company-name-display" id="companyNameDisplay">Nama Perusahaan / Toko</div>
+    <div class="company-sub-display" id="companyAddressDisplay">Alamat · Kota</div>
+  </div>
+  <button class="btn bg2 bsm" onclick="openCompanyModal()">⚙️ <span>Pengaturan</span></button>
+</div>
+
+<!-- NAV -->
+<div class="nav">
+  <button class="nb active" onclick="nav('dashboard',this)">📊 <span class="lbl">Dashboard</span></button>
+  <button class="nb" onclick="nav('karyawan',this)">👥 <span class="lbl">Karyawan</span></button>
+  <button class="nb" onclick="nav('absensi',this)">📅 <span class="lbl">Absensi</span></button>
+  <button class="nb" onclick="nav('slip',this)">📄 <span class="lbl">Slip Gaji</span></button>
+  <button class="nb" onclick="nav('laporan',this)">🧾 <span class="lbl">Laporan</span></button>
+  <button class="nb" onclick="nav('panduan',this)">📖 <span class="lbl">Panduan</span></button>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div class="page active" id="page-dashboard">
+  <div class="stats">
+    <div class="stat"><div class="stat-val" style="color:var(--acc)" id="dTotalEmp">0</div><div class="stat-lbl">Karyawan</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--green)" id="dTotalGaji">Rp 0</div><div class="stat-lbl">Total Gaji/Bulan</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--gold)" id="dHadirHari">0</div><div class="stat-lbl">Hadir Hari Ini</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--red)" id="dAlphaHari">0</div><div class="stat-lbl">Alpha Hari Ini</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+    <div class="card">
+      <div class="card-title">👥 Daftar Karyawan</div>
+      <div id="dEmpList"><div class="empty"><div class="ico">👥</div><p>Belum ada karyawan</p></div></div>
+    </div>
+    <div class="card">
+      <div class="card-title">📅 Absensi Hari Ini</div>
+      <div id="dAttToday"><div class="empty"><div class="ico">📅</div><p>Belum ada absensi hari ini</p></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ KARYAWAN ══ -->
+<div class="page" id="page-karyawan">
+  <div class="sh">
+    <div class="sh-title">👥 Data Karyawan</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn bg2 bsm" onclick="downloadTemplate()">📥 Download Template</button>
+      <button class="btn bgreen bsm" onclick="document.getElementById('excelUpload').click()">📤 Upload Excel/CSV</button>
+      <input type="file" id="excelUpload" accept=".csv,.xlsx,.xls" style="display:none;">
+      <button class="btn bp bsm" onclick="openEmpModal()">＋ Tambah Manual</button>
+    </div>
+  </div>
+  <!-- Upload result preview -->
+  <div id="uploadPreview" style="display:none;" class="card">
+    <div class="card-title">📋 Preview Data Upload</div>
+    <div id="uploadPreviewContent"></div>
+    <div style="display:flex;gap:8px;margin-top:12px;">
+      <button class="btn bp bsm" id="confirmUploadBtn">✅ Import Semua</button>
+      <button class="btn bg2 bsm" onclick="cancelUpload()">Batal</button>
+    </div>
+  </div>
+  <div class="emp-grid" id="empGrid">
+    <div class="empty" style="grid-column:1/-1"><div class="ico">👥</div><p>Belum ada karyawan.<br>Tambah manual atau upload Excel!</p></div>
+  </div>
+</div>
+
+<!-- ══ ABSENSI ══ -->
+<div class="page" id="page-absensi">
+  <div class="sh">
+    <div class="sh-title">📅 Absensi Karyawan</div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+      <input type="month" id="attMonth" onchange="renderAbsensi()" style="background:var(--surface);border:1.5px solid var(--border);border-radius:9px;padding:7px 12px;color:var(--text);font-size:.8rem;font-family:inherit;">
+      <button class="btn bgreen bsm" onclick="exportAbsensi()">📥 Export Rekap</button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">Keterangan: H=Hadir · I=Izin · S=Sakit · A=Alpha · L=Libur</div>
+    <div class="att-wrap">
+      <table class="att" id="attTable">
+        <thead id="attHead"></thead>
+        <tbody id="attBody"></tbody>
+      </table>
+    </div>
+  </div>
+  <div class="card" style="margin-top:0;">
+    <div class="card-title">📊 Rekap Bulan Ini</div>
+    <div id="attSummary"></div>
+  </div>
+</div>
+
+<!-- ══ SLIP GAJI ══ -->
+<div class="page" id="page-slip">
+  <div class="sh">
+    <div class="sh-title">📄 Generate Slip Gaji</div>
+  </div>
+  <div style="display:grid;grid-template-columns:320px 1fr;gap:16px;align-items:start;">
+    <!-- Form -->
+    <div class="card">
+      <div class="card-title">⚙️ Setting Slip</div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="field">
+          <label>Karyawan</label>
+          <select id="slipEmp" onchange="fillSlipFromEmp()">
+            <option value="">— Pilih Karyawan —</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Periode Gaji</label>
+          <input type="month" id="slipPeriod">
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px;">
+          <div style="font-size:.65rem;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;">💰 Pendapatan</div>
+          <div class="field" style="margin-bottom:8px;"><label>Gaji Pokok</label><input type="number" id="slipGapok" placeholder="0" oninput="calcSlip()"></div>
+          <div class="field" style="margin-bottom:8px;"><label>Tunjangan Makan</label><input type="number" id="slipTMakan" placeholder="0" oninput="calcSlip()"></div>
+          <div class="field" style="margin-bottom:8px;"><label>Tunjangan Transport</label><input type="number" id="slipTTransport" placeholder="0" oninput="calcSlip()"></div>
+          <div class="field" style="margin-bottom:0;"><label>Lembur (jam × tarif)</label>
+            <div style="display:flex;gap:6px;">
+              <input type="number" id="slipLemburJam" placeholder="Jam" style="flex:1;" oninput="calcSlip()">
+              <input type="number" id="slipLemburTarif" placeholder="Tarif/jam" style="flex:2;" oninput="calcSlip()">
+            </div>
+          </div>
+        </div>
+        <div style="background:var(--surface2);border-radius:10px;padding:12px;">
+          <div style="font-size:.65rem;font-weight:800;color:var(--text3);letter-spacing:.8px;text-transform:uppercase;margin-bottom:8px;">✂️ Potongan</div>
+          <div class="field" style="margin-bottom:8px;"><label>BPJS Kesehatan (1%)</label><input type="number" id="slipBpjsKes" placeholder="0" oninput="calcSlip()"></div>
+          <div class="field" style="margin-bottom:8px;"><label>BPJS Ketenagakerjaan (2%)</label><input type="number" id="slipBpjsTk" placeholder="0" oninput="calcSlip()"></div>
+          <div class="field" style="margin-bottom:0;"><label>Potongan Lain</label><input type="number" id="slipPotonganLain" placeholder="0" oninput="calcSlip()"></div>
+        </div>
+        <div class="field"><label>Catatan</label><input type="text" id="slipNote" placeholder="cth: Termasuk bonus Lebaran"></div>
+        <button class="btn bp" onclick="generateSlip()" style="width:100%">🖨️ Generate & Print Slip</button>
+      </div>
+    </div>
+    <!-- Preview -->
+    <div>
+      <div class="card-title" style="margin-bottom:10px;">👁️ Preview Slip Gaji</div>
+      <div id="slipPreviewArea">
+        <div class="empty"><div class="ico">📄</div><p>Pilih karyawan dan periode<br>untuk preview slip gaji</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ LAPORAN ══ -->
+<div class="page" id="page-laporan">
+  <div class="sh">
+    <div class="sh-title">🧾 Laporan Penggajian</div>
+    <input type="month" id="laporanMonth" onchange="renderLaporan()" style="background:var(--surface);border:1.5px solid var(--border);border-radius:9px;padding:7px 12px;color:var(--text);font-size:.8rem;font-family:inherit;">
+  </div>
+  <div class="stats" style="grid-template-columns:repeat(3,1fr);">
+    <div class="stat"><div class="stat-val" style="color:var(--acc)" id="lTotalEmp">0</div><div class="stat-lbl">Karyawan Digaji</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--green)" id="lTotalGaji">Rp 0</div><div class="stat-lbl">Total Pengeluaran Gaji</div></div>
+    <div class="stat"><div class="stat-val" style="color:var(--gold)" id="lAvgGaji">Rp 0</div><div class="stat-lbl">Rata-rata Gaji</div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">📋 Detail Penggajian</div>
+    <div style="overflow-x:auto;">
+      <table class="att" id="laporanTable">
+        <thead><tr>
+          <th>Nama</th><th>Jabatan</th><th>Gaji Pokok</th>
+          <th>Tunjangan</th><th>Lembur</th><th>Potongan</th><th>Gaji Bersih</th>
+        </tr></thead>
+        <tbody id="laporanBody"></tbody>
+      </table>
+    </div>
+    <div id="laporanEmpty" class="empty"><div class="ico">📊</div><p>Belum ada data laporan</p></div>
+  </div>
+  <div style="text-align:right;margin-top:8px;">
+    <button class="btn bp bsm" onclick="printLaporan()">🖨️ Print Laporan</button>
+  </div>
+</div>
+
+<!-- ══ PANDUAN ══ -->
+<div class="page" id="page-panduan">
+  <div class="sh">
+    <div class="sh-title">📖 Panduan Penggunaan</div>
+  </div>
+
+  <!-- MULAI CEPAT -->
+  <div class="card">
+    <div class="card-title">🚀 Mulai Cepat — 4 Langkah</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;">
+      <div style="background:var(--acc3);border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:1.8rem;margin-bottom:8px;">⚙️</div>
+        <div style="font-weight:800;font-size:.88rem;color:var(--acc);margin-bottom:4px;">1. Setup Perusahaan</div>
+        <div style="font-size:.75rem;color:var(--text2);line-height:1.5;">Klik tombol <strong>"⚙️ Pengaturan"</strong> di atas. Isi nama toko/perusahaan dan upload logo.</div>
+      </div>
+      <div style="background:var(--green3);border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:1.8rem;margin-bottom:8px;">👥</div>
+        <div style="font-weight:800;font-size:.88rem;color:var(--green);margin-bottom:4px;">2. Tambah Karyawan</div>
+        <div style="font-size:.75rem;color:var(--text2);line-height:1.5;">Menu <strong>Karyawan</strong> → tambah manual satu per satu, atau upload file Excel/CSV sekaligus.</div>
+      </div>
+      <div style="background:var(--gold2);border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:1.8rem;margin-bottom:8px;">📅</div>
+        <div style="font-weight:800;font-size:.88rem;color:var(--gold-dark,#946800);margin-bottom:4px;">3. Catat Absensi</div>
+        <div style="font-size:.75rem;color:var(--text2);line-height:1.5;">Menu <strong>Absensi</strong> → klik kotak per karyawan per hari, atau absen cepat dari Dashboard.</div>
+      </div>
+      <div style="background:#ffd6e7;border-radius:12px;padding:16px;text-align:center;">
+        <div style="font-size:1.8rem;margin-bottom:8px;">📄</div>
+        <div style="font-weight:800;font-size:.88rem;color:#c2255c;margin-bottom:4px;">4. Generate Slip Gaji</div>
+        <div style="font-size:.75rem;color:var(--text2);line-height:1.5;">Menu <strong>Slip Gaji</strong> → pilih karyawan & periode → print/PDF langsung dengan logo perusahaan.</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+
+    <!-- ABSENSI -->
+    <div class="card">
+      <div class="card-title">📅 Cara Mengisi Absensi</div>
+      <div style="font-size:.82rem;color:var(--text2);line-height:1.8;">
+        Klik kotak pada tabel untuk memilih status. Setiap klik akan berganti otomatis:
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin:12px 0;">
+        <span style="background:#d3f9d8;color:#0ca678;border-radius:6px;padding:4px 12px;font-weight:800;font-size:.8rem;">H = Hadir</span>
+        <span style="background:#fff3bf;color:#e67700;border-radius:6px;padding:4px 12px;font-weight:800;font-size:.8rem;">I = Izin</span>
+        <span style="background:#ffe8cc;color:#e8590c;border-radius:6px;padding:4px 12px;font-weight:800;font-size:.8rem;">S = Sakit</span>
+        <span style="background:#ffc9c9;color:#f03e3e;border-radius:6px;padding:4px 12px;font-weight:800;font-size:.8rem;">A = Alpha</span>
+        <span style="background:#dbe4ff;color:#3b5bdb;border-radius:6px;padding:4px 12px;font-weight:800;font-size:.8rem;">L = Libur</span>
+      </div>
+      <div style="font-size:.8rem;color:var(--text2);line-height:1.7;">
+        💡 <strong>Tips:</strong> Dari Dashboard, gunakan tombol absen cepat <em>(H/I/S/A/L)</em> untuk mencatat semua karyawan sekaligus dalam satu klik.<br><br>
+        📥 Klik <strong>"Export Rekap"</strong> untuk cetak rekap absensi bulanan.
+      </div>
+    </div>
+
+    <!-- SLIP GAJI -->
+    <div class="card">
+      <div class="card-title">📄 Cara Membuat Slip Gaji</div>
+      <ol style="font-size:.82rem;color:var(--text2);line-height:2;padding-left:18px;">
+        <li>Buka menu <strong>Slip Gaji</strong></li>
+        <li>Pilih <strong>nama karyawan</strong> dari dropdown</li>
+        <li>Data gaji otomatis terisi dari profil karyawan</li>
+        <li>Pilih <strong>periode bulan</strong> yang akan dibuat</li>
+        <li>Sesuaikan komponen gaji jika perlu (lembur, potongan, dll)</li>
+        <li>Klik <strong>"🖨️ Generate & Print Slip"</strong></li>
+        <li>Pilih <strong>Print</strong> atau <strong>Save as PDF</strong></li>
+      </ol>
+      <div style="background:var(--acc3);border-radius:9px;padding:10px 12px;font-size:.78rem;color:var(--acc);margin-top:8px;">
+        💡 Logo dan nama perusahaan akan otomatis muncul di slip gaji sesuai pengaturan perusahaan.
+      </div>
+    </div>
+
+    <!-- UPLOAD EXCEL -->
+    <div class="card">
+      <div class="card-title">📤 Upload Data Karyawan via Excel</div>
+      <ol style="font-size:.82rem;color:var(--text2);line-height:2;padding-left:18px;">
+        <li>Klik <strong>"📥 Download Template"</strong> di menu Karyawan</li>
+        <li>Buka file di <strong>Excel atau Google Sheets</strong></li>
+        <li>Isi data karyawan mulai <strong>baris ke-5</strong></li>
+        <li>Simpan sebagai <strong>CSV</strong> (File → Save As → CSV)</li>
+        <li>Klik <strong>"📤 Upload Excel/CSV"</strong></li>
+        <li>Cek preview data, lalu klik <strong>"✅ Import Semua"</strong></li>
+      </ol>
+      <div style="background:#fff3bf;border-radius:9px;padding:10px 12px;font-size:.78rem;color:#946800;margin-top:8px;">
+        ⚠️ Untuk file .xlsx, simpan dulu sebagai CSV agar bisa dibaca dengan sempurna.
+      </div>
+    </div>
+
+    <!-- DATA & STORAGE -->
+    <div class="card">
+      <div class="card-title">💾 Tentang Data & Penyimpanan</div>
+      <div style="font-size:.82rem;color:var(--text2);line-height:1.8;">
+        <div style="margin-bottom:8px;">✅ <strong>Semua data tersimpan di browser</strong> (localStorage) — tidak perlu internet setelah file dibuka.</div>
+        <div style="margin-bottom:8px;">✅ <strong>Data aman</strong> — tidak dikirim ke server manapun, hanya ada di perangkat kamu.</div>
+        <div style="margin-bottom:8px;">⚠️ <strong>Gunakan browser yang sama</strong> — data tidak berpindah jika buka di browser berbeda.</div>
+        <div style="margin-bottom:8px;">⚠️ <strong>Jangan clear browser data</strong> — ini akan menghapus semua data yang tersimpan.</div>
+        <div>💡 <strong>Tips backup:</strong> Rutin export rekap absensi & laporan penggajian sebagai PDF setiap bulan.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- LAPORAN -->
+  <div class="card">
+    <div class="card-title">🧾 Cara Menggunakan Laporan Penggajian</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;font-size:.82rem;color:var(--text2);line-height:1.7;">
+      <div>
+        <div style="font-weight:800;color:var(--text);margin-bottom:6px;">Laporan otomatis berisi:</div>
+        <ul style="padding-left:16px;line-height:2;">
+          <li>Total karyawan yang digaji</li>
+          <li>Total pengeluaran gaji bulan tersebut</li>
+          <li>Rata-rata gaji per karyawan</li>
+          <li>Detail per karyawan (gaji pokok, tunjangan, lembur, potongan, bersih)</li>
+        </ul>
+      </div>
+      <div>
+        <div style="font-weight:800;color:var(--text);margin-bottom:6px;">Tips penggunaan:</div>
+        <ul style="padding-left:16px;line-height:2;">
+          <li>Pilih bulan menggunakan selector di kanan atas</li>
+          <li>Laporan terisi otomatis dari data slip gaji yang sudah dibuat</li>
+          <li>Klik <strong>"🖨️ Print Laporan"</strong> untuk cetak atau save PDF</li>
+          <li>Simpan laporan tiap bulan sebagai arsip penggajian</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- VERSI INFO -->
+  <div style="text-align:center;padding:16px;font-size:.72rem;color:var(--text3);">
+    HR Kit UMKM v1.0 · Slip Gaji & Absensi · Untuk pertanyaan hubungi seller 😊
+  </div>
+</div>
+
+</div><!-- end .app -->
+
+<!-- MODAL: COMPANY -->
+<div class="mo" id="companyModal">
+  <div class="modal">
+    <div class="mh"><div class="mt">⚙️ Pengaturan Perusahaan</div><button class="mc" onclick="closeModal('companyModal')">✕</button></div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div class="field"><label>Nama Perusahaan / Toko *</label><input type="text" id="cName" placeholder="cth: Toko Berkah Jaya"></div>
+      <div class="field"><label>Alamat</label><input type="text" id="cAddress" placeholder="Jl. Merdeka No. 1, Jakarta"></div>
+      <div class="field"><label>No. Telepon</label><input type="text" id="cPhone" placeholder="021-xxxx / 08xx"></div>
+      <div class="field"><label>Email</label><input type="email" id="cEmail" placeholder="info@toko.com"></div>
+      <div class="field"><label>Pimpinan / Pemilik</label><input type="text" id="cOwner" placeholder="Nama pimpinan untuk tanda tangan slip"></div>
+    </div>
+    <div style="display:flex;gap:9px;margin-top:14px;">
+      <button class="btn bp" onclick="saveCompany()" style="flex:1">💾 Simpan</button>
+      <button class="btn bg2" onclick="closeModal('companyModal')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: KARYAWAN -->
+<div class="mo" id="empModal">
+  <div class="modal">
+    <div class="mh"><div class="mt" id="empModalTitle">👤 Tambah Karyawan</div><button class="mc" onclick="closeModal('empModal')">✕</button></div>
+    <input type="hidden" id="empId">
+    <div class="fg">
+      <div class="field ff"><label>Nama Lengkap *</label><input type="text" id="eName" placeholder="cth: Budi Santoso"></div>
+      <div class="field"><label>Jabatan *</label><input type="text" id="eRole" placeholder="cth: Kasir, Cook, Driver"></div>
+      <div class="field"><label>Departemen</label><input type="text" id="eDept" placeholder="cth: Produksi, Pelayanan"></div>
+      <div class="field"><label>Tanggal Masuk</label><input type="date" id="eJoinDate"></div>
+      <div class="field"><label>Gaji Pokok (Rp)</label><input type="number" id="eGapok" placeholder="0" min="0"></div>
+      <div class="field"><label>Tunjangan Tetap (Rp)</label><input type="number" id="eTunjangan" placeholder="0" min="0"></div>
+      <div class="field"><label>No. HP</label><input type="text" id="ePhone" placeholder="08xx-xxxx-xxxx"></div>
+      <div class="field"><label>No. KTP</label><input type="text" id="eKtp" placeholder="16 digit"></div>
+      <div class="field ff"><label>Alamat</label><input type="text" id="eAddress" placeholder="Alamat tempat tinggal"></div>
+      <div class="field"><label>No. BPJS Kesehatan</label><input type="text" id="eBpjsKes" placeholder="opsional"></div>
+      <div class="field"><label>No. BPJS Ketenagakerjaan</label><input type="text" id="eBpjsTk" placeholder="opsional"></div>
+      <div class="field"><label>Rekening Bank</label><input type="text" id="eBank" placeholder="cth: BCA 1234567890"></div>
+      <div class="field ff"><label>Status</label>
+        <select id="eStatus">
+          <option value="active">✅ Aktif</option>
+          <option value="inactive">❌ Tidak Aktif</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:9px;margin-top:14px;">
+      <button class="btn bp" id="saveEmpBtn" style="flex:1">💾 Simpan</button>
+      <button class="btn bg2" onclick="closeModal('empModal')">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: SLIP PRINT -->
+<div class="mo" id="slipPrintModal">
+  <div class="modal wide">
+    <div class="mh"><div class="mt">📄 Slip Gaji</div><button class="mc" onclick="closeModal('slipPrintModal')">✕</button></div>
+    <div id="slipPrintContent"></div>
+    <div style="display:flex;gap:9px;margin-top:14px;">
+      <button class="btn bp" onclick="printSlip()">🖨️ Print / PDF</button>
+      <button class="btn bg2" onclick="closeModal('slipPrintModal')">Tutup</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONFIRM -->
+<div class="cfmo" id="cfmOverlay">
+  <div class="cfmb">
+    <div style="font-size:1.8rem;margin-bottom:8px;">🗑️</div>
+    <div style="font-family:'Instrument Serif',serif;font-size:1rem;font-style:italic;margin-bottom:6px;">Yakin dihapus?</div>
+    <div style="font-size:.8rem;color:var(--text2);margin-bottom:18px;" id="cfmMsg">Data akan dihapus permanen.</div>
+    <div style="display:flex;gap:9px;justify-content:center;">
+      <button class="btn bd" id="cfmYes">Ya, Hapus</button>
+      <button class="btn bg2" onclick="closeCfm()">Batal</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══ DATA ═══
+const KEY={co:'hrkit_company',emps:'hrkit_emps',att:'hrkit_att',slips:'hrkit_slips'};
+const load=k=>{try{return JSON.parse(localStorage.getItem(k)||'null');}catch(e){return null;}};
+const loadArr=k=>{try{return JSON.parse(localStorage.getItem(k)||'[]');}catch(e){return[];}};
+const save=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+
+let company=load(KEY.co)||{name:'',address:'',phone:'',email:'',owner:'',logo:''};
+let emps=loadArr(KEY.emps);
+let att=load(KEY.att)||{};
+let slips=loadArr(KEY.slips);
+
+const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const todayStr=()=>new Date().toISOString().split('T')[0];
+const nowMonth=()=>new Date().toISOString().slice(0,7);
+const fmtRp=n=>'Rp '+Math.round(n||0).toLocaleString('id-ID');
+const fmtDate=d=>d?new Date(d+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}):'—';
+const fmtMonth=m=>{if(!m) return '—'; const [y,mo]=m.split('-'); const mn=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember']; return mn[parseInt(mo)-1]+' '+y;};
+const COLORS=['#3b5bdb','#0ca678','#e8590c','#ae3ec9','#f59f00','#1098ad','#c92a2a','#2b8a3e'];
+const STATUS_ATT={H:'Hadir',I:'Izin',S:'Sakit',A:'Alpha',L:'Libur'};
+
+// ═══ NAV ═══
+function nav(page,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nb').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  if(el) el.classList.add('active');
+  if(page==='dashboard') renderDashboard();
+  if(page==='karyawan')  renderKaryawan();
+  if(page==='absensi')   renderAbsensi();
+  if(page==='slip')      initSlip();
+  if(page==='laporan')   renderLaporan();
+  // panduan is static, no render needed
+}
+
+// ═══ COMPANY ═══
+function openCompanyModal(){
+  document.getElementById('cName').value=company.name||'';
+  document.getElementById('cAddress').value=company.address||'';
+  document.getElementById('cPhone').value=company.phone||'';
+  document.getElementById('cEmail').value=company.email||'';
+  document.getElementById('cOwner').value=company.owner||'';
+  document.getElementById('companyModal').classList.add('open');
+}
+function saveCompany(){
+  company.name=document.getElementById('cName').value.trim();
+  company.address=document.getElementById('cAddress').value.trim();
+  company.phone=document.getElementById('cPhone').value.trim();
+  company.email=document.getElementById('cEmail').value.trim();
+  company.owner=document.getElementById('cOwner').value.trim();
+  save(KEY.co,company);
+  updateCompanyBar();
+  closeModal('companyModal');
+  toast('Pengaturan disimpan!','success');
+}
+function updateCompanyBar(){
+  document.getElementById('companyNameDisplay').textContent=company.name||'Nama Perusahaan / Toko';
+  document.getElementById('companyAddressDisplay').textContent=
+    [company.address,company.phone].filter(Boolean).join(' · ')||'Alamat · Kota';
+  if(company.logo){
+    document.getElementById('logoPlaceholder').style.display='none';
+    let img=document.getElementById('logoPreview').querySelector('img');
+    if(!img){img=document.createElement('img');img.style.cssText='width:100%;height:100%;object-fit:contain;';document.getElementById('logoPreview').appendChild(img);}
+    img.src=company.logo;
+  }
+}
+
+// ═══ KARYAWAN ═══
+function openEmpModal(id){
+  document.getElementById('empId').value='';
+  ['eName','eRole','eDept','eJoinDate','eGapok','eTunjangan','ePhone','eKtp','eAddress','eBpjsKes','eBpjsTk','eBank'].forEach(i=>document.getElementById(i).value='');
+  document.getElementById('eStatus').value='active';
+  document.getElementById('empModalTitle').textContent='👤 Tambah Karyawan';
+  if(id){
+    const e=emps.find(x=>x.id===id);
+    if(e){
+      document.getElementById('empModalTitle').textContent='✏️ Edit Karyawan';
+      document.getElementById('empId').value=e.id;
+      document.getElementById('eName').value=e.name||'';
+      document.getElementById('eRole').value=e.role||'';
+      document.getElementById('eDept').value=e.dept||'';
+      document.getElementById('eJoinDate').value=e.joinDate||'';
+      document.getElementById('eGapok').value=e.gapok||'';
+      document.getElementById('eTunjangan').value=e.tunjangan||'';
+      document.getElementById('ePhone').value=e.phone||'';
+      document.getElementById('eKtp').value=e.ktp||'';
+      document.getElementById('eAddress').value=e.address||'';
+      document.getElementById('eBpjsKes').value=e.bpjsKes||'';
+      document.getElementById('eBpjsTk').value=e.bpjsTk||'';
+      document.getElementById('eBank').value=e.bank||'';
+      document.getElementById('eStatus').value=e.status||'active';
+    }
+  }
+  document.getElementById('empModal').classList.add('open');
+}
+
+function saveEmp(){
+  const name=document.getElementById('eName').value.trim();
+  const role=document.getElementById('eRole').value.trim();
+  if(!name){toast('Nama karyawan wajib diisi!','error');return;}
+  if(!role){toast('Jabatan wajib diisi!','error');return;}
+  const id=document.getElementById('empId').value;
+  const data={
+    id:id||uid(),name,role,
+    dept:document.getElementById('eDept').value.trim(),
+    joinDate:document.getElementById('eJoinDate').value,
+    gapok:parseFloat(document.getElementById('eGapok').value)||0,
+    tunjangan:parseFloat(document.getElementById('eTunjangan').value)||0,
+    phone:document.getElementById('ePhone').value.trim(),
+    ktp:document.getElementById('eKtp').value.trim(),
+    address:document.getElementById('eAddress').value.trim(),
+    bpjsKes:document.getElementById('eBpjsKes').value.trim(),
+    bpjsTk:document.getElementById('eBpjsTk').value.trim(),
+    bank:document.getElementById('eBank').value.trim(),
+    status:document.getElementById('eStatus').value,
+    createdAt:id?(emps.find(x=>x.id===id)?.createdAt||new Date().toISOString()):new Date().toISOString(),
+  };
+  if(id) emps=emps.map(e=>e.id===id?data:e);
+  else emps.push(data);
+  save(KEY.emps,emps);
+  closeModal('empModal');
+  renderKaryawan();
+  renderDashboard();
+  populateEmpSelects();
+  toast((id?name+' diupdate!':name+' ditambahkan! 👤'),'success');
+}
+
+function deleteEmp(id){
+  const e=emps.find(x=>x.id===id);
+  confirm2(e?.name+' akan dihapus permanen.',()=>{
+    emps=emps.filter(x=>x.id!==id);
+    save(KEY.emps,emps);
+    renderKaryawan();
+    renderDashboard();
+    populateEmpSelects();
+    toast('Karyawan dihapus','info');
+  });
+}
+
+function calcLamaBekerja(joinDate){
+  if(!joinDate) return '—';
+  const start=new Date(joinDate);
+  const now=new Date();
+  const months=(now.getFullYear()-start.getFullYear())*12+(now.getMonth()-start.getMonth());
+  if(months<1) return 'Baru masuk';
+  if(months<12) return months+' bulan';
+  const y=Math.floor(months/12);
+  const m=months%12;
+  return y+' thn'+(m?' '+m+' bln':'');
+}
+
+function renderKaryawan(){
+  const grid=document.getElementById('empGrid');
+  const active=emps.filter(e=>e.status==='active');
+  if(!emps.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="ico">👥</div><p>Belum ada karyawan.<br>Tambah manual atau upload Excel!</p></div>';return;}
+  grid.innerHTML=emps.map((e,i)=>{
+    const col=COLORS[i%COLORS.length];
+    const initials=e.name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    const lama=calcLamaBekerja(e.joinDate);
+    return '<div class="emp-card">'+
+      (e.status==='inactive'?'<span style="position:absolute;top:10px;right:10px;font-size:.6rem;font-weight:800;padding:2px 7px;border-radius:50px;background:var(--red2);color:var(--red);">Tidak Aktif</span>':'')+
+      '<div class="emp-avatar" style="background:'+col+';">'+initials+'</div>'+
+      '<div class="emp-name">'+e.name+'</div>'+
+      '<div class="emp-role">'+e.role+(e.dept?' · '+e.dept:'')+'</div>'+
+      (e.joinDate?'<div style="font-size:.7rem;color:var(--text3);margin-bottom:4px;">📅 Masuk: '+fmtDate(e.joinDate)+' <span style="color:var(--acc);font-weight:700;">('+lama+')</span></div>':'')+
+      '<div class="emp-salary">'+fmtRp(e.gapok)+(e.tunjangan?' + '+fmtRp(e.tunjangan):'')+' / bulan</div>'+
+      (e.phone?'<div style="font-size:.7rem;color:var(--text3);margin-top:4px;">📱 '+e.phone+'</div>':'')+
+      (e.bank?'<div style="font-size:.7rem;color:var(--text3);">🏦 '+e.bank+'</div>':'')+
+      '<div class="emp-actions">'+
+        '<button class="btn bg2 bxs" data-eid="'+e.id+'" data-ea="edit">✏️ Edit</button>'+
+        '<button class="btn bgreen bxs" data-eid="'+e.id+'" data-ea="slip">📄 Slip</button>'+
+        '<button class="btn bd bxs" data-eid="'+e.id+'" data-ea="del">🗑</button>'+
+      '</div>'+
+    '</div>';
+  }).join('');
+}
+
+// ═══ ABSENSI ═══
+function getAttKey(empId,date){return empId+'_'+date;}
+
+function setAtt(empId,date,status){
+  const k=getAttKey(empId,date);
+  if(att[k]===status) delete att[k];
+  else att[k]=status;
+  save(KEY.att,att);
+  renderAbsensi();
+  renderDashboard();
+}
+
+function renderAbsensi(){
+  const monthEl=document.getElementById('attMonth');
+  const month=monthEl.value||nowMonth();
+  if(!monthEl.value) monthEl.value=month;
+
+  const [y,m]=month.split('-').map(Number);
+  const daysInMonth=new Date(y,m,0).getDate();
+  const activeEmps=emps.filter(e=>e.status==='active');
+
+  if(!activeEmps.length){
+    document.getElementById('attTable').innerHTML='';
+    document.getElementById('attSummary').innerHTML='<div class="empty"><div class="ico">👥</div><p>Belum ada karyawan aktif</p></div>';
+    return;
+  }
+
+  // Build header
+  let headHtml='<tr><th style="min-width:120px;">Nama</th>';
+  for(let d=1;d<=daysInMonth;d++){
+    const date=new Date(y,m-1,d);
+    const isSun=date.getDay()===0;
+    headHtml+='<th class="att-cell" style="'+(isSun?'color:var(--red);':'')+'">'+(d<10?'0':'')+d+'</th>';
+  }
+  headHtml+='<th class="att-cell">H</th><th class="att-cell">I</th><th class="att-cell">S</th><th class="att-cell">A</th><th class="att-cell">L</th></tr>';
+  document.getElementById('attHead').innerHTML=headHtml;
+
+  // Build body
+  let bodyHtml='';
+  const summary=[];
+  activeEmps.forEach(e=>{
+    let H=0,I=0,S=0,A=0,L=0;
+    bodyHtml+='<tr><td style="font-weight:700;white-space:nowrap;min-width:120px;">'+e.name+'</td>';
+    for(let d=1;d<=daysInMonth;d++){
+      const dateStr=y+'-'+(m<10?'0'+m:m)+'-'+(d<10?'0'+d:d);
+      const status=att[getAttKey(e.id,dateStr)]||'';
+      if(status==='H') H++;else if(status==='I') I++;else if(status==='S') S++;else if(status==='A') A++;else if(status==='L') L++;
+      bodyHtml+='<td class="att-cell"><button class="att-btn'+(status?' att-'+status:'')+'" data-eid="'+e.id+'" data-date="'+dateStr+'">'+(status||'·')+'</button></td>';
+    }
+    bodyHtml+='<td class="att-cell" style="font-weight:700;color:var(--green);">'+H+'</td>'+
+      '<td class="att-cell" style="color:var(--gold);">'+I+'</td>'+
+      '<td class="att-cell" style="color:var(--orange);">'+S+'</td>'+
+      '<td class="att-cell" style="color:var(--red);font-weight:700;">'+A+'</td>'+
+      '<td class="att-cell" style="color:var(--acc);">'+L+'</td></tr>';
+    summary.push({name:e.name,H,I,S,A,L,total:daysInMonth-L});
+  });
+  document.getElementById('attBody').innerHTML=bodyHtml;
+
+  // Summary
+  document.getElementById('attSummary').innerHTML=
+    '<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;">'+
+    summary.map(s=>'<div style="background:var(--surface2);border-radius:10px;padding:12px;">'+
+      '<div style="font-weight:800;font-size:.85rem;margin-bottom:6px;">'+s.name+'</div>'+
+      '<div style="display:flex;gap:8px;font-size:.75rem;flex-wrap:wrap;">'+
+        '<span style="color:var(--green)">H: '+s.H+'</span>'+
+        '<span style="color:var(--gold)">I: '+s.I+'</span>'+
+        '<span style="color:var(--orange)">S: '+s.S+'</span>'+
+        '<span style="color:var(--red)">A: '+s.A+'</span>'+
+        '<span style="color:var(--acc)">L: '+s.L+'</span>'+
+      '</div>'+
+      '<div style="font-size:.7rem;color:var(--text3);margin-top:4px;">'+
+        'Kehadiran: '+Math.round(s.H/(s.total||1)*100)+'%'+
+      '</div>'+
+    '</div>').join('')+
+    '</div>';
+}
+
+function exportAbsensi(){
+  const month=document.getElementById('attMonth').value||nowMonth();
+  const [y,m]=month.split('-').map(Number);
+  const activeEmps=emps.filter(e=>e.status==='active');
+  const daysInMonth=new Date(y,m,0).getDate();
+  const MN=['Januari','Februari','Maret','April','Mei','Juni','Juli','Agustus','September','Oktober','November','Desember'];
+
+  let html='<html><head><meta charset="UTF-8"><title>Rekap Absensi '+MN[m-1]+' '+y+'</title>'+
+    '<style>body{font-family:Arial,sans-serif;padding:20px;font-size:12px;}'+
+    'h2{color:#3b5bdb;margin-bottom:4px;}h3{color:#666;font-weight:normal;margin-bottom:16px;}'+
+    'table{border-collapse:collapse;width:100%;}th,td{border:1px solid #ddd;padding:5px 8px;text-align:center;}'+
+    'th{background:#f0f2f9;font-weight:bold;}td:first-child{text-align:left;font-weight:bold;}'+
+    '.H{color:#0ca678;}.I{color:#e67700;}.S{color:#e8590c;}.A{color:#f03e3e;font-weight:bold;}.L{color:#3b5bdb;}'+
+    '</style></head><body>'+
+    '<h2>'+(company.name||'Rekap Absensi')+'</h2>'+
+    '<h3>Rekap Absensi Karyawan — '+MN[m-1]+' '+y+'</h3>'+
+    '<table><thead><tr><th>Nama</th>';
+  for(let d=1;d<=daysInMonth;d++) html+='<th>'+(d<10?'0':'')+d+'</th>';
+  html+='<th>H</th><th>I</th><th>S</th><th>A</th><th>L</th></tr></thead><tbody>';
+  activeEmps.forEach(e=>{
+    let H=0,I=0,S=0,A=0,L=0;
+    html+='<tr><td>'+e.name+'</td>';
+    for(let d=1;d<=daysInMonth;d++){
+      const dateStr=y+'-'+(m<10?'0'+m:m)+'-'+(d<10?'0'+d:d);
+      const s=att[getAttKey(e.id,dateStr)]||'';
+      if(s==='H') H++;else if(s==='I') I++;else if(s==='S') S++;else if(s==='A') A++;else if(s==='L') L++;
+      html+='<td class="'+s+'">'+( s||'')+'</td>';
+    }
+    html+='<td class="H">'+H+'</td><td class="I">'+I+'</td><td class="S">'+S+'</td><td class="A">'+A+'</td><td class="L">'+L+'</td></tr>';
+  });
+  html+='</tbody></table><p style="margin-top:20px;color:#999;font-size:10px;">Dicetak: '+new Date().toLocaleDateString('id-ID')+'</p></body></html>';
+  const w=window.open('','_blank');
+  w.document.write(html);
+  w.document.close();
+  setTimeout(()=>w.print(),500);
+}
+
+// ═══ SLIP GAJI ═══
+function initSlip(){
+  populateEmpSelects();
+  const el=document.getElementById('slipPeriod');
+  if(!el.value) el.value=nowMonth();
+}
+
+function fillSlipFromEmp(){
+  const empId=document.getElementById('slipEmp').value;
+  if(!empId){return;}
+  const e=emps.find(x=>x.id===empId);
+  if(!e) return;
+  document.getElementById('slipGapok').value=e.gapok||0;
+  document.getElementById('slipTMakan').value='';
+  document.getElementById('slipTTransport').value=e.tunjangan||0;
+  document.getElementById('slipLemburJam').value='';
+  document.getElementById('slipLemburTarif').value=Math.round((e.gapok||0)/173); // std lembur
+  // Auto BPJS
+  const bpjsKes=Math.round((e.gapok||0)*0.01);
+  const bpjsTk=Math.round((e.gapok||0)*0.02);
+  document.getElementById('slipBpjsKes').value=bpjsKes;
+  document.getElementById('slipBpjsTk').value=bpjsTk;
+  document.getElementById('slipPotonganLain').value='';
+  calcSlip();
+}
+
+function calcSlip(){
+  const empId=document.getElementById('slipEmp').value;
+  const period=document.getElementById('slipPeriod').value;
+  if(!empId||!period){document.getElementById('slipPreviewArea').innerHTML='<div class="empty"><div class="ico">📄</div><p>Pilih karyawan dan periode<br>untuk preview slip gaji</p></div>';return;}
+  const e=emps.find(x=>x.id===empId);
+  if(!e) return;
+
+  const gapok=parseFloat(document.getElementById('slipGapok').value)||0;
+  const tMakan=parseFloat(document.getElementById('slipTMakan').value)||0;
+  const tTransport=parseFloat(document.getElementById('slipTTransport').value)||0;
+  const lemburJam=parseFloat(document.getElementById('slipLemburJam').value)||0;
+  const lemburTarif=parseFloat(document.getElementById('slipLemburTarif').value)||0;
+  const lembur=lemburJam*lemburTarif;
+  const bpjsKes=parseFloat(document.getElementById('slipBpjsKes').value)||0;
+  const bpjsTk=parseFloat(document.getElementById('slipBpjsTk').value)||0;
+  const potonganLain=parseFloat(document.getElementById('slipPotonganLain').value)||0;
+  const note=document.getElementById('slipNote').value;
+
+  const totalPendapatan=gapok+tMakan+tTransport+lembur;
+  const totalPotongan=bpjsKes+bpjsTk+potonganLain;
+  const gajiBersih=totalPendapatan-totalPotongan;
+
+  document.getElementById('slipPreviewArea').innerHTML=buildSlipHTML({
+    e,period,gapok,tMakan,tTransport,lembur,lemburJam,lemburTarif,
+    bpjsKes,bpjsTk,potonganLain,totalPendapatan,totalPotongan,gajiBersih,note
+  });
+}
+
+function buildSlipHTML(d){
+  const {e,period,gapok,tMakan,tTransport,lembur,lemburJam,lemburTarif,
+    bpjsKes,bpjsTk,potonganLain,totalPendapatan,totalPotongan,gajiBersih,note}=d;
+  return '<div class="slip-preview" id="slipContent">'+
+    '<div class="slip-header">'+
+      '<div style="display:flex;align-items:center;gap:12px;">'+
+        (company.logo?'<img class="slip-company-logo" src="'+company.logo+'" alt="logo">':
+          '<div style="width:48px;height:48px;border-radius:8px;background:linear-gradient(135deg,#3b5bdb,#364fc7);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:1.1rem;">'+
+            (company.name?company.name[0].toUpperCase():'H')+
+          '</div>')+
+        '<div>'+
+          '<div class="slip-company-name">'+(company.name||'Nama Perusahaan')+'</div>'+
+          '<div class="slip-company-sub">'+(company.address||'')+(company.phone?' | '+company.phone:'')+'</div>'+
+        '</div>'+
+      '</div>'+
+      '<div class="slip-title">'+
+        '<div class="slip-title-text">Slip Gaji</div>'+
+        '<div class="slip-period">'+fmtMonth(period)+'</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="slip-emp">'+
+      '<div class="slip-emp-row"><span class="slip-emp-lbl">Nama</span><span class="slip-emp-val">'+e.name+'</span></div>'+
+      '<div class="slip-emp-row"><span class="slip-emp-lbl">Jabatan</span><span class="slip-emp-val">'+e.role+'</span></div>'+
+      (e.dept?'<div class="slip-emp-row"><span class="slip-emp-lbl">Departemen</span><span class="slip-emp-val">'+e.dept+'</span></div>':'')+
+      (e.joinDate?'<div class="slip-emp-row"><span class="slip-emp-lbl">Tgl Masuk</span><span class="slip-emp-val">'+fmtDate(e.joinDate)+'</span></div>':'')+
+      (e.bank?'<div class="slip-emp-row"><span class="slip-emp-lbl">Rekening</span><span class="slip-emp-val">'+e.bank+'</span></div>':'')+
+    '</div>'+
+    '<table class="slip-table">'+
+      '<thead><tr><th>Komponen</th><th></th><th style="text-align:right;">Jumlah</th></tr></thead>'+
+      '<tbody>'+
+        '<tr><td colspan="3" style="background:#f7f8fc;font-weight:800;font-size:.68rem;letter-spacing:.8px;text-transform:uppercase;color:#5a6080;">PENDAPATAN</td></tr>'+
+        '<tr><td>Gaji Pokok</td><td></td><td class="right">'+fmtRp(gapok)+'</td></tr>'+
+        (tMakan?'<tr><td>Tunjangan Makan</td><td></td><td class="right">'+fmtRp(tMakan)+'</td></tr>':'')+
+        (tTransport?'<tr><td>Tunjangan Transport</td><td></td><td class="right">'+fmtRp(tTransport)+'</td></tr>':'')+
+        (lembur?'<tr><td>Lembur</td><td style="font-size:.72rem;color:#666;">'+lemburJam+'j × '+fmtRp(lemburTarif)+'</td><td class="right">'+fmtRp(lembur)+'</td></tr>':'')+
+        '<tr class="slip-total-row"><td colspan="2">Total Pendapatan</td><td class="right">'+fmtRp(totalPendapatan)+'</td></tr>'+
+        '<tr><td colspan="3" style="background:#f7f8fc;font-weight:800;font-size:.68rem;letter-spacing:.8px;text-transform:uppercase;color:#5a6080;">POTONGAN</td></tr>'+
+        (bpjsKes?'<tr><td>BPJS Kesehatan (1%)</td><td></td><td class="right">'+fmtRp(bpjsKes)+'</td></tr>':'')+
+        (bpjsTk?'<tr><td>BPJS Ketenagakerjaan (2%)</td><td></td><td class="right">'+fmtRp(bpjsTk)+'</td></tr>':'')+
+        (potonganLain?'<tr><td>Potongan Lain</td><td></td><td class="right">'+fmtRp(potonganLain)+'</td></tr>':'')+
+        (!bpjsKes&&!bpjsTk&&!potonganLain?'<tr><td colspan="3" style="color:#999;font-size:.78rem;">Tidak ada potongan</td></tr>':'')+
+        '<tr class="slip-total-row"><td colspan="2">Total Potongan</td><td class="right">'+fmtRp(totalPotongan)+'</td></tr>'+
+      '</tbody>'+
+    '</table>'+
+    '<div class="slip-net"><span class="slip-net-lbl">GAJI BERSIH DITERIMA</span><span class="slip-net-val">'+fmtRp(gajiBersih)+'</span></div>'+
+    (note?'<div style="margin-top:10px;font-size:.74rem;color:#666;font-style:italic;">*'+note+'</div>':'')+
+    '<div class="slip-footer">'+
+      '<div>'+
+        '<div style="font-size:.7rem;color:#999;">Diterbitkan: '+new Date().toLocaleDateString('id-ID')+'</div>'+
+        (e.bpjsKes?'<div style="font-size:.68rem;color:#999;margin-top:2px;">BPJS Kes: '+e.bpjsKes+'</div>':'')+
+      '</div>'+
+      '<div class="slip-sign">'+
+        '<div class="slip-sign-line"></div>'+
+        '<div style="font-size:.72rem;font-weight:700;">'+(company.owner||'Pimpinan')+'</div>'+
+        '<div style="font-size:.65rem;color:#999;">'+(company.name||'Perusahaan')+'</div>'+
+      '</div>'+
+    '</div>'+
+  '</div>';
+}
+
+function generateSlip(){
+  const empId=document.getElementById('slipEmp').value;
+  const period=document.getElementById('slipPeriod').value;
+  if(!empId){toast('Pilih karyawan dulu!','error');return;}
+  if(!period){toast('Pilih periode gaji!','error');return;}
+  calcSlip();
+  const slipHTML=document.getElementById('slipContent')?.outerHTML;
+  if(!slipHTML){toast('Generate preview dulu!','error');return;}
+  document.getElementById('slipPrintContent').innerHTML=slipHTML;
+  document.getElementById('slipPrintModal').classList.add('open');
+}
+
+function printSlip(){
+  const content=document.getElementById('slipPrintContent').innerHTML;
+  const css=`
+    body{font-family:'Plus Jakarta Sans',Arial,sans-serif;padding:20px;margin:0;}
+    .slip-preview{max-width:600px;margin:0 auto;padding:24px;border:1px solid #eee;border-radius:10px;}
+    .slip-header{display:flex;justify-content:space-between;align-items:flex-start;padding-bottom:14px;border-bottom:2px solid #1a1d2e;margin-bottom:14px;}
+    .slip-company-logo{width:48px;height:48px;border-radius:8px;object-fit:contain;}
+    .slip-company-name{font-weight:800;font-size:1rem;color:#1a1d2e;}
+    .slip-company-sub{font-size:.68rem;color:#666;margin-top:2px;}
+    .slip-title-text{font-size:.95rem;font-weight:800;color:#3b5bdb;letter-spacing:1px;text-transform:uppercase;text-align:right;}
+    .slip-period{font-size:.68rem;color:#666;text-align:right;margin-top:3px;}
+    .slip-emp{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:14px;background:#f7f8fc;border-radius:8px;padding:10px;}
+    .slip-emp-row{font-size:.74rem;display:flex;gap:5px;}
+    .slip-emp-lbl{color:#666;min-width:80px;}
+    .slip-emp-val{font-weight:700;color:#1a1d2e;}
+    .slip-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:.76rem;}
+    .slip-table th{background:#f0f2f9;padding:6px 9px;text-align:left;font-size:.62rem;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:#5a6080;}
+    .slip-table td{padding:7px 9px;border-bottom:1px solid #eee;}
+    .right{text-align:right;font-family:monospace;}
+    .slip-total-row{background:#f0f2f9;}
+    .slip-total-row td{font-weight:800;}
+    .slip-net{background:#3b5bdb;border-radius:8px;padding:12px 14px;display:flex;justify-content:space-between;align-items:center;color:#fff;margin-top:12px;}
+    .slip-net-lbl{font-weight:700;font-size:.8rem;}
+    .slip-net-val{font-family:monospace;font-size:1.1rem;font-weight:500;}
+    .slip-footer{margin-top:14px;padding-top:12px;border-top:1px solid #eee;display:flex;justify-content:space-between;font-size:.68rem;color:#999;}
+    .slip-sign{text-align:center;}
+    .slip-sign-line{width:90px;height:1px;background:#999;margin:26px auto 4px;}
+  `;
+  const w=window.open('','_blank');
+  w.document.write('<html><head><meta charset="UTF-8"><title>Slip Gaji</title><style>'+css+'</style></head><body>'+content+'</body></html>');
+  w.document.close();
+  setTimeout(()=>w.print(),500);
+}
+
+// ═══ LAPORAN ═══
+function renderLaporan(){
+  const el=document.getElementById('laporanMonth');
+  const month=el.value||nowMonth();
+  if(!el.value) el.value=month;
+
+  const slipsMonth=slips.filter(s=>s.period===month);
+  document.getElementById('lTotalEmp').textContent=slipsMonth.length;
+  const totalG=slipsMonth.reduce((s,sl)=>s+sl.gajiBersih,0);
+  const avgG=slipsMonth.length?totalG/slipsMonth.length:0;
+  document.getElementById('lTotalGaji').textContent=fmtRp(totalG);
+  document.getElementById('lAvgGaji').textContent=fmtRp(avgG);
+
+  // Use active employees for report
+  const activeEmps=emps.filter(e=>e.status==='active');
+  if(!activeEmps.length){
+    document.getElementById('laporanBody').innerHTML='';
+    document.getElementById('laporanEmpty').style.display='block';
+    return;
+  }
+  document.getElementById('laporanEmpty').style.display='none';
+
+  document.getElementById('laporanBody').innerHTML=activeEmps.map(e=>{
+    const sl=slipsMonth.find(s=>s.empId===e.id);
+    const tunjangan=(sl?.tMakan||0)+(sl?.tTransport||0);
+    const lembur=sl?.lembur||0;
+    const potongan=sl?.totalPotongan||0;
+    const bersih=sl?.gajiBersih||0;
+    return '<tr>'+
+      '<td style="font-weight:700;">'+e.name+'</td>'+
+      '<td style="font-size:.78rem;color:var(--text2);">'+e.role+'</td>'+
+      '<td style="font-family:\'JetBrains Mono\',monospace;font-size:.76rem;">'+fmtRp(sl?.gapok||e.gapok)+'</td>'+
+      '<td style="font-family:\'JetBrains Mono\',monospace;font-size:.76rem;">'+fmtRp(tunjangan)+'</td>'+
+      '<td style="font-family:\'JetBrains Mono\',monospace;font-size:.76rem;">'+fmtRp(lembur)+'</td>'+
+      '<td style="font-family:\'JetBrains Mono\',monospace;font-size:.76rem;color:var(--red);">'+fmtRp(potongan)+'</td>'+
+      '<td style="font-family:\'JetBrains Mono\',monospace;font-size:.78rem;color:var(--green);font-weight:600;">'+fmtRp(bersih||e.gapok)+'</td>'+
+    '</tr>';
+  }).join('');
+}
+
+function printLaporan(){
+  const month=document.getElementById('laporanMonth').value||nowMonth();
+  const w=window.open('','_blank');
+  const tableHTML=document.getElementById('laporanTable').outerHTML;
+  w.document.write('<html><head><meta charset="UTF-8"><title>Laporan Penggajian</title>'+
+    '<style>body{font-family:Arial,sans-serif;padding:20px;font-size:12px;}'+
+    'h2{color:#3b5bdb;}table{border-collapse:collapse;width:100%;}'+
+    'th,td{border:1px solid #ddd;padding:7px 10px;}th{background:#f0f2f9;font-weight:bold;}</style></head>'+
+    '<body><h2>'+(company.name||'Laporan Penggajian')+'</h2>'+
+    '<h3 style="font-weight:normal;color:#666;">Periode: '+fmtMonth(month)+'</h3>'+
+    tableHTML+'<p style="margin-top:20px;font-size:10px;color:#999;">Dicetak: '+new Date().toLocaleDateString('id-ID')+'</p>'+
+    '</body></html>');
+  w.document.close();
+  setTimeout(()=>w.print(),500);
+}
+
+// ═══ DASHBOARD ═══
+function renderDashboard(){
+  const activeEmps=emps.filter(e=>e.status==='active');
+  const totalGaji=activeEmps.reduce((s,e)=>s+(e.gapok||0)+(e.tunjangan||0),0);
+  const today2=todayStr();
+  const hadirToday=activeEmps.filter(e=>att[getAttKey(e.id,today2)]==='H').length;
+  const alphaToday=activeEmps.filter(e=>att[getAttKey(e.id,today2)]==='A').length;
+
+  document.getElementById('dTotalEmp').textContent=activeEmps.length;
+  document.getElementById('dTotalGaji').textContent=fmtRp(totalGaji);
+  document.getElementById('dHadirHari').textContent=hadirToday;
+  document.getElementById('dAlphaHari').textContent=alphaToday;
+
+  // Emp list
+  document.getElementById('dEmpList').innerHTML=activeEmps.length?activeEmps.map((e,i)=>{
+    const col=COLORS[i%COLORS.length];
+    const init=e.name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();
+    const todayAtt=att[getAttKey(e.id,today2)]||'';
+    const attColors={H:['#d3f9d8','#0ca678'],I:['#fff3bf','#e67700'],S:['#ffe8cc','#e8590c'],A:['#ffc9c9','#f03e3e'],L:['#dbe4ff','#3b5bdb']};
+    const ac=attColors[todayAtt]||['var(--surface2)','var(--text3)'];
+    return '<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);">'+
+      '<div style="width:32px;height:32px;border-radius:9px;background:'+col+';display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:.75rem;flex-shrink:0;">'+init+'</div>'+
+      '<div style="flex:1;min-width:0;"><div style="font-weight:700;font-size:.84rem;">'+e.name+'</div><div style="font-size:.7rem;color:var(--text3);">'+e.role+'</div></div>'+
+      '<span style="font-size:.65rem;font-weight:800;padding:2px 8px;border-radius:50px;background:'+ac[0]+';color:'+ac[1]+';">'+(todayAtt||'—')+'</span>'+
+    '</div>';
+  }).join(''):'<div class="empty"><div class="ico">👥</div><p>Belum ada karyawan aktif</p></div>';
+
+  // Today attendance quick
+  document.getElementById('dAttToday').innerHTML=activeEmps.length?
+    '<div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:10px;">'+
+      ['H','I','S','A','L'].map(s=>'<button class="att-btn att-'+s+'" style="width:auto;padding:4px 10px;" data-bulk="'+s+'">'+STATUS_ATT[s]+'</button>').join('')+
+    '</div>'+
+    '<div style="font-size:.7rem;color:var(--text3);margin-bottom:8px;">Klik untuk absen cepat semua karyawan hari ini</div>'+
+    activeEmps.map(e=>{
+      const todayAtt2=att[getAttKey(e.id,today2)]||'';
+      return '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--border);">'+
+        '<div style="flex:1;font-size:.82rem;font-weight:600;">'+e.name+'</div>'+
+        '<div style="display:flex;gap:3px;">'+
+          ['H','I','S','A','L'].map(s=>'<button class="att-btn'+(todayAtt2===s?' att-'+s:'')+'" style="width:26px;height:24px;font-size:.65rem;" data-eid="'+e.id+'" data-date="'+today2+'" data-status="'+s+'">'+s+'</button>').join('')+
+        '</div>'+
+      '</div>';
+    }).join('')
+  :'<div class="empty"><div class="ico">👥</div><p>Tambah karyawan dulu</p></div>';
+}
+
+// ═══ POPULATE SELECTS ═══
+function populateEmpSelects(){
+  const activeEmps=emps.filter(e=>e.status==='active');
+  const opt='<option value="">— Pilih Karyawan —</option>'+activeEmps.map(e=>'<option value="'+e.id+'">'+e.name+'</option>').join('');
+  document.getElementById('slipEmp').innerHTML=opt;
+}
+
+// ═══ EXCEL UPLOAD / DOWNLOAD ═══
+let pendingImport=[];
+
+function downloadTemplate(){
+  // Template Excel sudah diembed di dalam app
+  const b64='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';
+  const binary=atob(b64);
+  const bytes=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+  const blob=new Blob([bytes],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='template_karyawan_hrkit.xlsx';
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  toast('Template Excel didownload! 📥 Buka di Excel atau Google Sheets','success');
+}
+
+function parseCSV(text){
+  const lines=text.trim().split('\n');
+  if(lines.length<2) return [];
+  const headers=lines[0].split(',').map(h=>h.trim().replace(/"/g,'').toLowerCase());
+  return lines.slice(1).map(line=>{
+    const vals=line.split(',').map(v=>v.trim().replace(/"/g,''));
+    const obj={};
+    headers.forEach((h,i)=>{ obj[h]=vals[i]||''; });
+    return obj;
+  }).filter(r=>r['nama']||r[headers[0]]);
+}
+
+function mapCSVRow(row){
+  // Try to find columns flexibly
+  const get=(...keys)=>{
+    for(const k of keys){
+      for(const rk of Object.keys(row)){
+        if(rk.includes(k)) return row[rk]||'';
+      }
+    }
+    return '';
+  };
+  const nama=get('nama','name');
+  if(!nama) return null;
+  const gapokRaw=get('gaji','salary','gapok').replace(/[^0-9]/g,'');
+  const tunjRaw=get('tunjangan','allowance').replace(/[^0-9]/g,'');
+  return {
+    id:uid(),
+    name:nama,
+    role:get('jabatan','position','role','posisi'),
+    dept:get('departemen','dept','division','divisi'),
+    joinDate:get('tanggal','join','masuk','tgl'),
+    gapok:parseInt(gapokRaw)||0,
+    tunjangan:parseInt(tunjRaw)||0,
+    phone:get('hp','phone','telepon','tel','wa'),
+    bank:get('rekening','bank','account'),
+    ktp:get('ktp','nik','id'),
+    bpjsKes:get('bpjs kes','bpjs k','kesehatan'),
+    bpjsTk:get('bpjs tk','ketenagakerjaan','bpjst'),
+    address:'',status:'active',
+    createdAt:new Date().toISOString(),
+  };
+}
+
+function handleExcelUpload(file){
+  if(!file) return;
+  const ext=file.name.split('.').pop().toLowerCase();
+  if(!['csv','xlsx','xls'].includes(ext)){toast('File harus CSV atau Excel!','error');return;}
+
+  const reader=new FileReader();
+  reader.onload=e=>{
+    let rows=[];
+    if(ext==='csv'){
+      rows=parseCSV(e.target.result);
+    } else {
+      // For xlsx - use basic binary read
+      try {
+        // Simple xlsx text extraction
+        const text=e.target.result;
+        toast('File XLSX terdeteksi. Untuk hasil terbaik gunakan format CSV.','info');
+        // Try to parse as text anyway
+        rows=parseCSV(text);
+      } catch(err){
+        toast('Gagal baca XLSX. Simpan dulu sebagai CSV!','error');
+        return;
+      }
+    }
+
+    const mapped=rows.map(mapCSVRow).filter(Boolean);
+    if(!mapped.length){toast('Tidak ada data valid ditemukan!','error');return;}
+
+    pendingImport=mapped;
+    showUploadPreview(mapped);
+  };
+
+  if(ext==='csv') reader.readAsText(file, 'UTF-8');
+  else reader.readAsBinaryString(file);
+}
+
+function showUploadPreview(data){
+  document.getElementById('uploadPreview').style.display='block';
+  const errors=data.filter(d=>!d.role);
+  document.getElementById('uploadPreviewContent').innerHTML=
+    '<div style="margin-bottom:10px;font-size:.8rem;color:var(--text2);">'+
+      '<span style="color:var(--green);font-weight:700;">'+data.length+' karyawan</span> siap diimport'+
+      (errors.length?' · <span style="color:var(--gold);font-weight:700;">'+errors.length+' data tidak ada jabatan</span>':'')+
+    '</div>'+
+    '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:.76rem;">'+
+      '<thead><tr>'+
+        ['Nama','Jabatan','Tgl Masuk','Lama Bekerja','Gaji Pokok','No HP'].map(h=>
+          '<th style="background:var(--surface2);padding:6px 10px;text-align:left;border-bottom:2px solid var(--border);font-size:.62rem;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);">'+h+'</th>'
+        ).join('')+
+      '</tr></thead><tbody>'+
+      data.map(d=>'<tr style="border-bottom:1px solid var(--border);">'+
+        '<td style="padding:7px 10px;font-weight:700;">'+d.name+'</td>'+
+        '<td style="padding:7px 10px;color:var(--text2);">'+(d.role||'<span style="color:var(--red)">Kosong!</span>')+'</td>'+
+        '<td style="padding:7px 10px;font-size:.72rem;">'+(d.joinDate||'—')+'</td>'+
+        '<td style="padding:7px 10px;font-size:.72rem;color:var(--acc);">'+calcLamaBekerja(d.joinDate)+'</td>'+
+        '<td style="padding:7px 10px;font-family:\'JetBrains Mono\',monospace;font-size:.72rem;">'+fmtRp(d.gapok)+'</td>'+
+        '<td style="padding:7px 10px;font-size:.72rem;">'+(d.phone||'—')+'</td>'+
+      '</tr>').join('')+
+    '</tbody></table></div>';
+  document.getElementById('uploadPreview').scrollIntoView({behavior:'smooth'});
+}
+
+function cancelUpload(){
+  pendingImport=[];
+  document.getElementById('uploadPreview').style.display='none';
+  document.getElementById('excelUpload').value='';
+}
+
+function confirmUpload(){
+  if(!pendingImport.length) return;
+  // Check duplicates by name
+  let added=0, skipped=0;
+  pendingImport.forEach(d=>{
+    const exists=emps.find(e=>e.name.toLowerCase()===d.name.toLowerCase());
+    if(!exists){ emps.push(d); added++; }
+    else skipped++;
+  });
+  save(KEY.emps,emps);
+  cancelUpload();
+  renderKaryawan();
+  renderDashboard();
+  populateEmpSelects();
+  toast(added+' karyawan berhasil diimport!'+(skipped?' ('+skipped+' duplikat dilewati)':''),'success');
+}
+
+// ═══ UTILS ═══
+function closeModal(id){document.getElementById(id).classList.remove('open');}
+function openModal(id){document.getElementById(id).classList.add('open');}
+
+function toggleTheme(){
+  const isLight=document.documentElement.getAttribute('data-theme')==='light';
+  document.documentElement.setAttribute('data-theme',isLight?'':'light');
+  const btn=document.getElementById('themeToggleBtn');
+  if(btn) btn.textContent=isLight?'☀️ Light':'🌙 Dark';
+  localStorage.setItem('hrkit_theme',isLight?'dark':'light');
+}
+
+let cfmCb=null;
+function confirm2(msg,cb){
+  cfmCb=cb;
+  document.getElementById('cfmMsg').textContent=msg;
+  document.getElementById('cfmOverlay').classList.add('open');
+}
+function closeCfm(){document.getElementById('cfmOverlay').classList.remove('open');cfmCb=null;}
+
+function toast(msg,type='info'){
+  const t=document.createElement('div');
+  t.className='toast '+type;t.textContent=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(),3000);
+}
+
+// ═══ INIT ═══
+document.addEventListener('DOMContentLoaded',()=>{
+  updateCompanyBar();
+  renderDashboard();
+  populateEmpSelects();
+
+  // Logo upload
+  document.getElementById('logoInput').addEventListener('change',function(){
+    const file=this.files[0]; if(!file) return;
+    const reader=new FileReader();
+    reader.onload=e=>{
+      const img=new Image();
+      img.onload=()=>{
+        const canvas=document.createElement('canvas');
+        const MAX=200; let w=img.width,h=img.height;
+        if(w>MAX||h>MAX){if(w>h){h=Math.round(h*MAX/w);w=MAX;}else{w=Math.round(w*MAX/h);h=MAX;}}
+        canvas.width=w;canvas.height=h;
+        canvas.getContext('2d').drawImage(img,0,0,w,h);
+        company.logo=canvas.toDataURL('image/png',0.85);
+        save(KEY.co,company);
+        updateCompanyBar();
+        toast('Logo berhasil diupload!','success');
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Excel upload
+  document.getElementById('excelUpload').addEventListener('change',function(){
+    if(this.files[0]) handleExcelUpload(this.files[0]);
+  });
+  document.getElementById('confirmUploadBtn').addEventListener('click', confirmUpload);
+
+  // Modal overlays
+  document.querySelectorAll('.mo,.cfmo').forEach(m=>{
+    m.addEventListener('click',e=>{if(e.target===m){m.classList.remove('open');cfmCb=null;}});
+  });
+
+  // Confirm
+  document.getElementById('cfmYes').addEventListener('click',()=>{if(cfmCb){cfmCb();closeCfm();}});
+
+  // Save emp
+  document.getElementById('saveEmpBtn').addEventListener('click',saveEmp);
+
+  // Karyawan grid actions
+  document.getElementById('empGrid').addEventListener('click',e=>{
+    const btn=e.target.closest('[data-eid]');
+    if(!btn) return;
+    const {eid,ea}=btn.dataset;
+    if(ea==='edit') openEmpModal(eid);
+    if(ea==='del')  deleteEmp(eid);
+    if(ea==='slip'){
+      nav('slip',document.querySelector('.nb[onclick*="slip"]'));
+      setTimeout(()=>{document.getElementById('slipEmp').value=eid;fillSlipFromEmp();},100);
+    }
+  });
+
+  // Attendance table clicks
+  document.getElementById('attBody').addEventListener('click',e=>{
+    const btn=e.target.closest('.att-btn[data-eid]');
+    if(!btn) return;
+    const{eid,date}=btn.dataset;
+    // Cycle through statuses
+    const cur=att[getAttKey(eid,date)]||'';
+    const cycle=['','H','I','S','A','L'];
+    const next=cycle[(cycle.indexOf(cur)+1)%cycle.length];
+    if(next) att[getAttKey(eid,date)]=next;
+    else delete att[getAttKey(eid,date)];
+    save(KEY.att,att);
+    renderAbsensi();
+  });
+
+  // Dashboard today attendance
+  document.getElementById('dAttToday').addEventListener('click',e=>{
+    // Individual att buttons
+    const btn=e.target.closest('[data-eid][data-status]');
+    if(btn){
+      const{eid,date,status}=btn.dataset;
+      setAtt(eid,date,status);
+      renderDashboard();
+      return;
+    }
+    // Bulk buttons
+    const bulk=e.target.closest('[data-bulk]');
+    if(bulk){
+      const status=bulk.dataset.bulk;
+      const today3=todayStr();
+      emps.filter(e=>e.status==='active').forEach(e=>{att[getAttKey(e.id,today3)]=status;});
+      save(KEY.att,att);
+      renderDashboard();
+      toast('Semua karyawan: '+STATUS_ATT[status],'success');
+    }
+  });
+
+  // Init month selects
+  document.getElementById('attMonth').value=nowMonth();
+  document.getElementById('laporanMonth').value=nowMonth();
+});
+</script>
+</body>
+</html>
