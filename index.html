@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard Toko</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Syne:wght@700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0f1e; --panel:#0e1525; --card:#111827; --card2:#1a2235;
+  --border:#1f2d45; --accent:#6366f1; --accent2:#f59e0b; --accent3:#10b981;
+  --danger:#ef4444; --pink:#ec4899; --blue:#3b82f6;
+  --text:#f1f5f9; --muted:#64748b; --muted2:#94a3b8;
+}
+body.light {
+  --bg:#f0f4ff; --panel:#ffffff; --card:#ffffff; --card2:#f4f6fb;
+  --border:#e2e8f0; --text:#0f172a; --muted:#64748b; --muted2:#475569;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;transition:background .3s,color .3s;}
+
+/* BACKGROUND */
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(ellipse 70% 50% at 20% 0%,rgba(99,102,241,.1),transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 100%,rgba(16,185,129,.08),transparent 60%),
+    radial-gradient(ellipse 40% 30% at 50% 50%,rgba(236,72,153,.04),transparent 60%);}
+body.light::before{
+  background:
+    radial-gradient(ellipse 70% 50% at 20% 0%,rgba(99,102,241,.06),transparent 60%),
+    radial-gradient(ellipse 50% 40% at 80% 100%,rgba(16,185,129,.05),transparent 60%);}
+
+/* GRID PATTERN */
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);
+  background-size:40px 40px;opacity:.2;}
+body.light::after{opacity:.08;}
+
+#app{position:relative;z-index:1;max-width:1000px;margin:0 auto;padding:32px 20px 80px;}
+
+/* HEADER */
+.header{text-align:center;margin-bottom:48px;animation:fadeDown .6s ease both;}
+@keyframes fadeDown{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+.header-icon{
+  width:72px;height:72px;border-radius:20px;margin:0 auto 16px;
+  background:linear-gradient(135deg,#4f46e5,#6366f1,#10b981);
+  display:flex;align-items:center;justify-content:center;font-size:2rem;
+  box-shadow:0 8px 32px rgba(99,102,241,.4);
+  animation:iconPulse 3s ease infinite;
+}
+@keyframes iconPulse{0%,100%{box-shadow:0 8px 32px rgba(99,102,241,.4)}50%{box-shadow:0 8px 48px rgba(99,102,241,.6)}}
+.header-title{font-family:'Syne',sans-serif;font-size:2rem;font-weight:900;margin-bottom:6px;
+  background:linear-gradient(135deg,var(--text),var(--muted2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+body.light .header-title{background:linear-gradient(135deg,#0f172a,#475569);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.header-sub{font-size:.88rem;color:var(--muted);font-weight:500;}
+.toko-name{font-family:'Syne',sans-serif;font-size:1rem;font-weight:900;
+  background:linear-gradient(135deg,var(--accent),var(--accent3));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:flex-end;gap:8px;margin-bottom:32px;animation:fadeDown .5s ease both;}
+.theme-toggle{background:var(--card2);border:1.5px solid var(--border);border-radius:50px;
+  padding:6px 14px;cursor:pointer;font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;
+  color:var(--muted);transition:all .2s;display:inline-flex;align-items:center;gap:5px;}
+.theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
+.toko-badge{display:flex;align-items:center;gap:6px;padding:6px 14px;
+  background:var(--card2);border:1.5px solid var(--border);border-radius:50px;
+  font-size:.72rem;font-weight:700;color:var(--muted2);font-family:'Space Mono',monospace;}
+
+/* APP GRID */
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:16px;}
+.grid-2{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;margin:0 auto;max-width:660px;}
+
+/* APP CARD */
+.app-card{
+  background:var(--card);border:1.5px solid var(--border);border-radius:20px;
+  overflow:hidden;text-decoration:none;color:var(--text);
+  transition:all .25s cubic-bezier(.34,1.56,.64,1);
+  animation:fadeUp .5s ease both;
+  position:relative;
+  display:block;
+}
+.app-card:hover{transform:translateY(-6px) scale(1.01);border-color:var(--card-accent);
+  box-shadow:0 20px 48px rgba(0,0,0,.3),0 0 0 1px var(--card-accent);}
+body.light .app-card{box-shadow:0 2px 16px rgba(99,102,241,.07);}
+body.light .app-card:hover{box-shadow:0 20px 48px rgba(99,102,241,.15),0 0 0 1px var(--card-accent);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.app-card:nth-child(1){animation-delay:.05s}
+.app-card:nth-child(2){animation-delay:.1s}
+.app-card:nth-child(3){animation-delay:.15s}
+.app-card:nth-child(4){animation-delay:.2s}
+.app-card:nth-child(5){animation-delay:.25s}
+.grid-2 .app-card:nth-child(1){animation-delay:.3s}
+.grid-2 .app-card:nth-child(2){animation-delay:.35s}
+
+/* THUMBNAIL */
+.thumb{height:140px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.thumb-bg{position:absolute;inset:0;}
+.thumb-icon{font-size:3rem;position:relative;z-index:1;filter:drop-shadow(0 4px 12px rgba(0,0,0,.3));
+  transition:transform .3s;}
+.app-card:hover .thumb-icon{transform:scale(1.15) rotate(-5deg);}
+.thumb-deco{position:absolute;border-radius:50%;opacity:.15;}
+
+/* CARD BODY */
+.card-body{padding:16px 18px 18px;}
+.card-name{font-family:'Syne',sans-serif;font-size:.95rem;font-weight:900;margin-bottom:4px;}
+.card-desc{font-size:.76rem;color:var(--muted);line-height:1.5;}
+.card-tag{display:inline-flex;align-items:center;gap:4px;font-size:.62rem;font-weight:800;
+  padding:2px 8px;border-radius:50px;margin-top:8px;letter-spacing:.5px;}
+
+/* SECTION LABEL */
+.section-label{font-family:'Syne',sans-serif;font-size:.65rem;font-weight:800;color:var(--muted);
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:12px;margin-top:28px;
+  display:flex;align-items:center;gap:8px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* FOOTER */
+.footer{text-align:center;margin-top:48px;font-size:.72rem;color:var(--muted);animation:fadeUp .5s .5s ease both;opacity:0;animation-fill-mode:both;}
+.footer span{font-family:'Space Mono',monospace;}
+
+/* CARA PAKAI CARD */
+.docs-card{
+  display:flex;align-items:center;gap:14px;padding:16px 20px;
+  background:var(--card);border:1.5px solid var(--border);border-radius:16px;
+  text-decoration:none;color:var(--text);transition:all .2s;
+  animation:fadeUp .5s .4s ease both;opacity:0;animation-fill-mode:both;
+}
+.docs-card:hover{border-color:var(--accent);transform:translateX(4px);}
+.docs-icon{font-size:1.8rem;flex-shrink:0;}
+
+
+  20%{transform:translateX(-8px)}
+  40%{transform:translateX(8px)}
+  60%{transform:translateX(-5px)}
+  80%{transform:translateX(5px)}
+}
+
+/* ══ AUTH LOGIN ══ */
+#loginOverlay {
+  position:fixed;inset:0;z-index:9999;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  padding:20px;
+}
+#loginOverlay.hidden { display:none !important; }
+
+.lc {
+  background:var(--card);border:1.5px solid var(--border);border-radius:24px;
+  width:100%;max-width:420px;overflow:hidden;
+  animation:lcPop .4s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes lcPop {
+  from{opacity:0;transform:scale(.88) translateY(24px)}
+  to{opacity:1;transform:scale(1) translateY(0)}
+}
+@keyframes lcShake {
+  0%,100%{transform:translateX(0)}
+  20%{transform:translateX(-10px)} 40%{transform:translateX(10px)}
+  60%{transform:translateX(-6px)} 80%{transform:translateX(6px)}
+}
+.lc-hero {
+  background:linear-gradient(135deg,rgba(79,70,229,.2),rgba(16,185,129,.1));
+  padding:28px 28px 20px;text-align:center;border-bottom:1px solid var(--border);
+}
+.lc-logo { font-size:2.4rem; margin-bottom:8px; }
+.lc-title { font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:900;margin-bottom:3px; }
+.lc-sub { font-size:.78rem;color:var(--muted2); }
+.lc-body { padding:22px 26px 26px; }
+
+/* ROLE TABS */
+.role-tabs { display:flex;gap:6px;margin-bottom:20px;
+  background:var(--card2);border-radius:12px;padding:4px;border:1px solid var(--border);}
+.role-tab { flex:1;padding:10px 8px;border-radius:9px;border:none;background:transparent;
+  cursor:pointer;font-family:'Syne',sans-serif;font-size:.76rem;font-weight:700;
+  color:var(--muted);transition:all .2s;display:flex;align-items:center;justify-content:center;gap:5px;}
+.role-tab.active { background:linear-gradient(135deg,#4f46e5,var(--accent));color:#fff;
+  box-shadow:0 3px 10px rgba(99,102,241,.3); }
+
+/* PASSWORD INPUT */
+.pass-wrap { position:relative;margin-bottom:6px; }
+.pass-wrap input {
+  width:100%;background:var(--card2);border:2px solid var(--border);
+  border-radius:12px;padding:12px 44px 12px 14px;
+  color:var(--text);font-family:'Space Mono',monospace;
+  font-size:.95rem;font-weight:700;letter-spacing:2px;
+  outline:none;transition:border-color .2s,box-shadow .2s;
+}
+.pass-wrap input:focus { border-color:var(--accent);box-shadow:0 0 0 3px rgba(99,102,241,.12); }
+.pass-wrap input.error { border-color:var(--danger);box-shadow:0 0 0 3px rgba(239,68,68,.1); }
+.pass-toggle {
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  background:none;border:none;cursor:pointer;font-size:1rem;color:var(--muted);
+  padding:4px;transition:color .2s;
+}
+.pass-toggle:hover { color:var(--text); }
+
+.pass-hint { font-size:.7rem;color:var(--muted);margin-bottom:14px;margin-top:2px; }
+
+/* LOGIN BTN */
+.btn-login {
+  width:100%;padding:13px;border:none;border-radius:12px;cursor:pointer;
+  font-family:'Syne',sans-serif;font-size:.9rem;font-weight:800;
+  background:linear-gradient(135deg,#4f46e5,var(--accent));color:#fff;
+  box-shadow:0 4px 16px rgba(99,102,241,.3);transition:all .2s;
+  letter-spacing:.5px;
+}
+.btn-login:hover { transform:translateY(-1px);box-shadow:0 6px 22px rgba(99,102,241,.4); }
+.btn-login:active { transform:translateY(0); }
+.btn-login:disabled { opacity:.5;cursor:not-allowed;transform:none; }
+
+.login-err {
+  text-align:center;color:var(--danger);font-size:.76rem;font-weight:700;
+  min-height:18px;margin:10px 0 0;font-family:'Syne',sans-serif;
+}
+.login-skip { text-align:center;margin-top:14px; }
+.login-skip a { font-size:.72rem;color:var(--muted);cursor:pointer;text-decoration:underline; }
+.login-skip a:hover { color:var(--accent); }
+
+</style>
+</head>
+<body>
+
+<!-- ══ LOGIN OVERLAY ══ -->
+<div id="loginOverlay">
+  <div class="lc" id="loginCard">
+    <div class="lc-hero">
+      <div class="lc-logo" id="loginLogo">🏪</div>
+      <div class="lc-title" id="loginTokoName">TokoPOS</div>
+      <div class="lc-sub">Masuk untuk melanjutkan</div>
+    </div>
+    <div class="lc-body">
+
+      <!-- ROLE -->
+      <div class="role-tabs" style="grid-template-columns:1fr 1fr 1fr;">
+        <button class="role-tab active" id="roleOwnerTab" onclick="selectRole('owner')">
+          👑 Owner
+        </button>
+        <button class="role-tab" id="roleAdminTab" onclick="selectRole('admin')">
+          📋 Admin
+        </button>
+        <button class="role-tab" id="roleKasirTab" onclick="selectRole('kasir')">
+          🏷️ Kasir
+        </button>
+      </div>
+
+      <!-- PASSWORD -->
+      <div class="pass-wrap">
+        <input
+          type="password"
+          id="passInput"
+          placeholder="Masukkan password..."
+          autocomplete="current-password"
+          onkeydown="if(event.key==='Enter')doLogin()"
+          oninput="document.getElementById('passInput').classList.remove('error');
+                   document.getElementById('loginErr').textContent='';"
+        >
+        <button class="pass-toggle" onclick="togglePass()" id="passToggleBtn" type="button">👁</button>
+      </div>
+      <div class="pass-hint" id="passHint">Password Owner bisa berupa angka, huruf, atau kombinasi</div>
+
+      <button class="btn-login" onclick="doLogin()" id="btnLogin">
+        Masuk →
+      </button>
+
+      <div class="login-err" id="loginErr"></div>
+
+      <div class="login-skip" id="loginSkip" style="display:none;">
+        <a onclick="skipLogin()">Belum setup password? Masuk tanpa password →</a>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="app">
+
+  <!-- TOPBAR -->
+  <div class="topbar" id="mainTopbar">
+    <div class="toko-badge">🏪 <span id="tokoNameBadge">Toko</span></div>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark</button>
+  </div>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-icon" id="headerIcon">🏪</div>
+    <div class="header-title">Dashboard Toko</div>
+    <div class="header-sub">Semua aplikasi dalam satu tempat &mdash; <span class="toko-name" id="tokoNameHeader">nama toko kamu</span></div>
+  </div>
+
+  <!-- MAIN APPS -->
+  <div class="section-label">Aplikasi Utama</div>
+  <div class="grid">
+
+    <!-- KASIR -->
+    <a class="app-card" href="kasir.html" style="--card-accent:#10b981;">
+      <div class="thumb">
+        <div class="thumb-bg" style="background:linear-gradient(135deg,#064e3b,#065f46,#047857);"></div>
+        <div class="thumb-deco" style="width:120px;height:120px;background:#10b981;top:-30px;right:-30px;"></div>
+        <div class="thumb-deco" style="width:80px;height:80px;background:#34d399;bottom:-20px;left:-20px;"></div>
+        <!-- Mini POS UI -->
+        <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div class="thumb-icon" style="font-size:2.4rem;">🛒</div>
+          <div style="display:flex;gap:4px;">
+            <div style="background:rgba(16,185,129,.4);border:1px solid rgba(16,185,129,.6);border-radius:6px;padding:3px 8px;font-size:.6rem;font-weight:700;font-family:'Space Mono',monospace;color:#6ee7b7;">Rp 50.000</div>
+            <div style="background:rgba(16,185,129,.3);border:1px solid rgba(16,185,129,.5);border-radius:6px;padding:3px 8px;font-size:.6rem;font-weight:700;color:#6ee7b7;">TUNAI</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Kasir</div>
+        <div class="card-desc">Point of Sale — transaksi penjualan, struk otomatis, stok update langsung</div>
+        <div class="card-tag" style="background:rgba(16,185,129,.12);color:#10b981;border:1px solid rgba(16,185,129,.2);">🔑 Utama</div>
+      </div>
+    </a>
+
+    <!-- INVENTORY -->
+    <a class="app-card" href="inventory.html" style="--card-accent:#6366f1;">
+      <div class="thumb">
+        <div class="thumb-bg" style="background:linear-gradient(135deg,#1e1b4b,#312e81,#3730a3);"></div>
+        <div class="thumb-deco" style="width:100px;height:100px;background:#6366f1;top:-20px;left:-20px;"></div>
+        <div class="thumb-deco" style="width:70px;height:70px;background:#818cf8;bottom:-10px;right:-10px;"></div>
+        <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div class="thumb-icon" style="font-size:2.4rem;">📦</div>
+          <div style="display:flex;gap:3px;">
+            <div style="background:rgba(99,102,241,.4);border:1px solid rgba(99,102,241,.6);border-radius:4px;padding:2px 6px;font-size:.55rem;font-weight:700;color:#c7d2fe;">Stok: 48</div>
+            <div style="background:rgba(239,68,68,.3);border:1px solid rgba(239,68,68,.5);border-radius:4px;padding:2px 6px;font-size:.55rem;font-weight:700;color:#fca5a5;">Alert: 3</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Inventory</div>
+        <div class="card-desc">Kelola stok produk, alert menipis, mutasi masuk/keluar, laporan nilai stok</div>
+        <div class="card-tag" style="background:rgba(99,102,241,.12);color:#6366f1;border:1px solid rgba(99,102,241,.2);">📦 Stok</div>
+      </div>
+    </a>
+
+    <!-- PELANGGAN -->
+    <a class="app-card" href="pelanggan.html" style="--card-accent:#ec4899;">
+      <div class="thumb">
+        <div class="thumb-bg" style="background:linear-gradient(135deg,#500724,#831843,#9d174d);"></div>
+        <div class="thumb-deco" style="width:110px;height:110px;background:#ec4899;top:-25px;right:-25px;"></div>
+        <div class="thumb-deco" style="width:60px;height:60px;background:#f9a8d4;bottom:-10px;left:20px;"></div>
+        <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:6px;">
+          <div class="thumb-icon" style="font-size:2.4rem;">👥</div>
+          <div style="display:flex;gap:3px;">
+            <div style="background:rgba(245,158,11,.3);border:1px solid rgba(245,158,11,.5);border-radius:4px;padding:2px 6px;font-size:.55rem;font-weight:700;color:#fde68a;">⭐ VIP</div>
+            <div style="background:rgba(236,72,153,.3);border:1px solid rgba(236,72,153,.5);border-radius:4px;padding:2px 6px;font-size:.55rem;font-weight:700;color:#fbcfe8;">🎂 Ultah</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Pelanggan</div>
+        <div class="card-desc">CRM — data pelanggan, blast promo WA, reminder ulang tahun, segmentasi</div>
+        <div class="card-tag" style="background:rgba(236,72,153,.12);color:#ec4899;border:1px solid rgba(236,72,153,.2);">👥 CRM</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- SECONDARY APPS -->
+  <div class="grid-2">
+
+    <!-- LAPORAN -->
+    <a class="app-card" href="laporan.html" style="--card-accent:#f59e0b;">
+      <div class="thumb" style="height:120px;">
+        <div class="thumb-bg" style="background:linear-gradient(135deg,#451a03,#78350f,#92400e);"></div>
+        <div class="thumb-deco" style="width:90px;height:90px;background:#f59e0b;bottom:-20px;right:-10px;"></div>
+        <div style="position:relative;z-index:1;display:flex;align-items:center;gap:10px;">
+          <div class="thumb-icon" style="font-size:2rem;">📊</div>
+          <div style="display:flex;flex-direction:column;gap:4px;">
+            <div style="height:6px;width:80px;background:linear-gradient(90deg,#f59e0b,#fbbf24);border-radius:3px;opacity:.9;"></div>
+            <div style="height:6px;width:55px;background:linear-gradient(90deg,#10b981,#34d399);border-radius:3px;opacity:.9;"></div>
+            <div style="height:6px;width:68px;background:linear-gradient(90deg,#6366f1,#818cf8);border-radius:3px;opacity:.9;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Laporan Keuangan</div>
+        <div class="card-desc">Jurnal, laba rugi, neraca, arus kas, laporan penjualan</div>
+        <div class="card-tag" style="background:rgba(245,158,11,.12);color:#f59e0b;border:1px solid rgba(245,158,11,.2);">📈 Akuntansi</div>
+      </div>
+    </a>
+
+    <!-- TOKO -->
+    <a class="app-card" href="toko.html" style="--card-accent:#94a3b8;">
+      <div class="thumb" style="height:120px;">
+        <div class="thumb-bg" style="background:linear-gradient(135deg,#0f172a,#1e293b,#334155);"></div>
+        <div class="thumb-deco" style="width:80px;height:80px;background:#94a3b8;top:-15px;left:-15px;"></div>
+        <div style="position:relative;z-index:1;display:flex;align-items:center;gap:10px;">
+          <div class="thumb-icon" style="font-size:2rem;">⚙️</div>
+          <div style="display:flex;flex-direction:column;gap:5px;">
+            <div style="display:flex;gap:4px;align-items:center;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#10b981;"></div>
+              <div style="font-size:.62rem;color:#94a3b8;font-family:'Space Mono',monospace;">Profil Toko</div>
+            </div>
+            <div style="display:flex;gap:4px;align-items:center;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#6366f1;"></div>
+              <div style="font-size:.62rem;color:#94a3b8;font-family:'Space Mono',monospace;">Struk & Cetak</div>
+            </div>
+            <div style="display:flex;gap:4px;align-items:center;">
+              <div style="width:8px;height:8px;border-radius:50%;background:#f59e0b;"></div>
+              <div style="font-size:.62rem;color:#94a3b8;font-family:'Space Mono',monospace;">Backup Data</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="card-name">Pengaturan Toko</div>
+        <div class="card-desc">Profil, struk, backup & restore, reset data</div>
+        <div class="card-tag" style="background:rgba(148,163,184,.12);color:#94a3b8;border:1px solid rgba(148,163,184,.2);">⚙️ Setting</div>
+      </div>
+    </a>
+
+  </div>
+
+  <!-- DOCS -->
+  <div class="section-label" style="margin-top:28px;">Panduan</div>
+  <a class="docs-card" href="cara-pakai.html">
+    <div class="docs-icon">📖</div>
+    <div>
+      <div style="font-family:'Syne',sans-serif;font-weight:900;font-size:.9rem;margin-bottom:3px;">Cara Pakai</div>
+      <div style="font-size:.76rem;color:var(--muted);">Panduan lengkap penggunaan semua fitur aplikasi</div>
+    </div>
+    <div style="margin-left:auto;color:var(--muted);font-size:1rem;">→</div>
+  </a>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>localStorage</span> · Data tersimpan di browser ini · Tidak butuh internet
+  </div>
+
+</div>
+
+
+
+
+<script>
+
+// ══════════════════════════════════════
+// TAUTH - AUTH SYSTEM
+// ══════════════════════════════════════
+(function(){
+  var KS='toko_auth_session', KC='toko_auth_config';
+  window.TAuth={
+    getConfig:function(){try{return JSON.parse(localStorage.getItem(KC)||'{}')}catch(e){return{}}},
+    saveConfig:function(c){localStorage.setItem(KC,JSON.stringify(c))},
+    getSession:function(){try{return JSON.parse(sessionStorage.getItem(KS)||'null')}catch(e){return null}},
+    login:function(pass,role){
+      var cfg=this.getConfig();
+      if(!cfg.pinOwner){
+        var s={role:'owner',loginAt:Date.now(),kasirName:'Owner'};
+        sessionStorage.setItem(KS,JSON.stringify(s));return'owner';
+      }
+      if(role==='owner'&&pass===cfg.pinOwner){
+        var s={role:'owner',loginAt:Date.now(),kasirName:'Owner'};
+        sessionStorage.setItem(KS,JSON.stringify(s));return'owner';
+      }
+      if(role==='admin'&&cfg.pinAdmin&&pass===cfg.pinAdmin){
+        var s={role:'admin',loginAt:Date.now(),kasirName:cfg.adminName||'Admin'};
+        sessionStorage.setItem(KS,JSON.stringify(s));return'admin';
+      }
+      if(role==='kasir'&&cfg.pinKasir&&pass===cfg.pinKasir){
+        var s={role:'kasir',loginAt:Date.now(),kasirName:cfg.kasirName||'Kasir'};
+        sessionStorage.setItem(KS,JSON.stringify(s));return'kasir';
+      }
+      return null;
+    },
+    logout:function(){sessionStorage.removeItem(KS);window.location.href='index.html';},
+    getRole:function(){var s=this.getSession();return s?s.role:null;},
+    isOwner:function(){return this.getRole()==='owner';},
+    isAdmin:function(){return this.getRole()==='admin';},
+    isKasir:function(){return this.getRole()==='kasir';},
+    isOwnerOrAdmin:function(){var r=this.getRole();return r==='owner'||r==='admin';},
+    isLoggedIn:function(){return!!this.getSession();},
+    // Owner only pages (laporan, toko)
+    requireOwner:function(){
+      var cfg=this.getConfig();if(!cfg.pinOwner)return;
+      var s=this.getSession();
+      if(!s){window.location.href='index.html';return;}
+      if(s.role==='kasir'){window.location.href='kasir.html';return;}
+      if(s.role==='admin'){window.location.href='index.html';}
+    },
+    // Owner + Admin pages (inventory, pelanggan)
+    requireOwnerOrAdmin:function(){
+      var cfg=this.getConfig();if(!cfg.pinOwner)return;
+      var s=this.getSession();
+      if(!s){window.location.href='index.html';return;}
+      if(s.role==='kasir'){window.location.href='kasir.html';}
+    },
+    // Semua role boleh (kasir.html)
+    requireAny:function(){
+      var cfg=this.getConfig();if(!cfg.pinOwner)return;
+      var s=this.getSession();if(!s){window.location.href='index.html';}
+    },
+    injectBadge:function(id){
+      var s=this.getSession(),cfg=this.getConfig();
+      if(!cfg.pinOwner||!s)return;
+      var el=document.getElementById(id);if(!el)return;
+      var role=s.role;
+      var colors={
+        owner:['rgba(99,102,241,.15)','rgba(99,102,241,.3)','#818cf8','&#x1F451;'],
+        admin:['rgba(245,158,11,.15)','rgba(245,158,11,.3)','#fbbf24','&#x1F4CB;'],
+        kasir:['rgba(16,185,129,.12)','rgba(16,185,129,.25)','#34d399','&#x1F3F7;']
+      };
+      var c=colors[role]||colors.kasir;
+      var d=document.createElement('div');
+      d.style.cssText='display:inline-flex;align-items:center;gap:6px;';
+      d.innerHTML='<div style="display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:50px;'
+        +'font-family:Syne,sans-serif;font-size:.7rem;font-weight:700;'
+        +'background:'+c[0]+';border:1px solid '+c[1]+';color:'+c[2]+';">'
+        +c[3]+' '+s.kasirName+'</div>'
+        +'<button onclick="TAuth.logout()" style="background:rgba(239,68,68,.1);'
+        +'border:1px solid rgba(239,68,68,.2);color:#f87171;border-radius:50px;'
+        +'padding:5px 10px;cursor:pointer;font-family:Syne,sans-serif;font-size:.68rem;font-weight:700;">Keluar</button>';
+      el.appendChild(d);
+    },
+    confirmOwnerPin:function(cb){
+      var cfg=this.getConfig();if(!cfg.pinOwner||this.isOwner()){cb();return;}
+      var p=prompt('Masukkan Password Owner:');
+      if(p===cfg.pinOwner)cb();else if(p!==null)alert('Password salah!');
+    }
+  };
+})();
+
+
+const KEY_TOKO = 'toko_profile';
+
+function getToko(){
+  try { return JSON.parse(localStorage.getItem(KEY_TOKO)||'{}'); } catch(e){ return {}; }
+}
+
+function loadTokoName(){
+  const t = getToko();
+  const nama = t.nama || '';
+  if(nama){
+    document.getElementById('tokoNameBadge').textContent = nama;
+    document.getElementById('tokoNameHeader').textContent = nama;
+  }
+  // Load logo
+  const iconEl = document.getElementById('headerIcon');
+  if(t.logo){
+    iconEl.innerHTML = '<img src="'+t.logo+'" style="width:100%;height:100%;object-fit:cover;border-radius:20px;">';
+    iconEl.style.padding = '0';
+  } else {
+    iconEl.innerHTML = '🏪';
+  }
+}
+
+// ── THEME TOGGLE ──
+function toggleTheme(){
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('idx_theme', isLight ? 'light' : 'dark');
+  updateThemeBtn(isLight);
+}
+function updateThemeBtn(isLight){
+  const btn = document.getElementById('themeBtn');
+  if(btn) btn.innerHTML = isLight ? '🌙 Dark' : '☀️ Light';
+}
+
+// (theme + init handled in login DOMContentLoaded below)
+
+// ══════════════════════════════════════
+// LOGIN
+// ══════════════════════════════════════
+let _selRole = 'owner';
+
+function selectRole(role){
+  _selRole = role;
+  document.getElementById('roleOwnerTab').classList.toggle('active', role==='owner');
+  document.getElementById('roleAdminTab').classList.toggle('active', role==='admin');
+  document.getElementById('roleKasirTab').classList.toggle('active', role==='kasir');
+  document.getElementById('passInput').value = '';
+  document.getElementById('passInput').classList.remove('error');
+  document.getElementById('loginErr').textContent = '';
+  document.getElementById('passHint').textContent =
+    role==='owner' ? 'Password Owner — akses penuh'
+    : role==='admin' ? 'Password Admin — input & kelola data'
+    : 'Password Kasir — transaksi saja';
+  document.getElementById('passInput').focus();
+}
+
+function togglePass(){
+  const inp = document.getElementById('passInput');
+  const btn = document.getElementById('passToggleBtn');
+  if(inp.type==='password'){ inp.type='text'; btn.textContent='🙈'; }
+  else { inp.type='password'; btn.textContent='👁'; }
+}
+
+function doLogin(){
+  const pass = document.getElementById('passInput').value;
+  if(!pass){
+    shakeCard();
+    document.getElementById('loginErr').textContent = '⚠️ Password tidak boleh kosong';
+    return;
+  }
+  const result = TAuth.login(pass, _selRole);
+  if(result === 'owner' || result === 'admin'){
+    document.getElementById('loginOverlay').classList.add('hidden');
+    document.getElementById('loginErr').textContent = '';
+  } else if(result === 'kasir'){
+    window.location.href = 'kasir.html';
+  } else {
+    shakeCard();
+    document.getElementById('passInput').classList.add('error');
+    document.getElementById('loginErr').textContent = '❌ Password salah, coba lagi';
+    document.getElementById('passInput').select();
+  }
+}
+
+function shakeCard(){
+  const card = document.getElementById('loginCard');
+  card.style.animation = 'none';
+  void card.offsetHeight;
+  card.style.animation = 'lcShake .4s ease';
+}
+
+function skipLogin(){
+  document.getElementById('loginOverlay').classList.add('hidden');
+}
+
+// ── INIT semua dalam satu DOMContentLoaded ──
+document.addEventListener('DOMContentLoaded', function(){
+
+  // 1. Theme
+  const savedTheme = localStorage.getItem('idx_theme');
+  if(savedTheme === 'light'){
+    document.body.classList.add('light');
+    updateThemeBtn(true);
+  }
+
+  // 2. Nama & logo toko
+  loadTokoName();
+  try {
+    const toko = JSON.parse(localStorage.getItem('toko_profile')||'{}');
+    if(toko.nama) document.getElementById('loginTokoName').textContent = toko.nama;
+    if(toko.logo) document.getElementById('loginLogo').innerHTML =
+      '<img src="'+toko.logo+'" style="width:60px;height:60px;border-radius:14px;object-fit:cover;">';
+  } catch(e){}
+
+  // 3. Auth badge
+  TAuth.injectBadge('mainTopbar');
+
+  // 4. Login overlay logic
+  const cfg = TAuth.getConfig();
+  const s   = TAuth.getSession();
+
+  // Belum setup password → skip langsung masuk, tampilkan notif setup
+  if(!cfg.pinOwner){
+    document.getElementById('loginOverlay').classList.add('hidden');
+    document.getElementById('loginSkip').style.display = 'block';
+    // Tampilkan banner setup password
+    showSetupBanner();
+    return;
+  }
+
+  // Owner / Admin sudah login → skip overlay
+  if(s && (s.role === 'owner' || s.role === 'admin')){
+    document.getElementById('loginOverlay').classList.add('hidden');
+    return;
+  }
+
+  // Kasir sudah login → langsung ke kasir.html
+  if(s && s.role === 'kasir'){
+    window.location.href = 'kasir.html';
+    return;
+  }
+
+  // Belum login → tampilkan overlay, fokus input
+  document.getElementById('loginOverlay').style.display = 'flex';
+  setTimeout(function(){ document.getElementById('passInput').focus(); }, 300);
+});
+
+function showSetupBanner(){
+  // Banner kuning di atas dashboard — ingatkan untuk setup password
+  const banner = document.createElement('div');
+  banner.style.cssText = [
+    'background:rgba(245,158,11,.12)',
+    'border:1px solid rgba(245,158,11,.3)',
+    'border-radius:12px',
+    'padding:10px 16px',
+    'margin-bottom:16px',
+    'font-size:.78rem',
+    'color:#fbbf24',
+    'display:flex',
+    'align-items:center',
+    'justify-content:space-between',
+    'gap:10px',
+    'font-family:Plus Jakarta Sans,sans-serif',
+    'font-weight:600'
+  ].join(';');
+  banner.innerHTML = [
+    '<span>⚠️ Password belum diset — semua orang bisa akses.',
+    'Segera setup di <a href="toko.html" style="color:#f59e0b;font-weight:800;',
+    'text-decoration:underline;">Pengaturan Toko → Password & Akses</a></span>',
+    '<span onclick="this.parentElement.remove()" style="cursor:pointer;color:#f59e0b;font-size:1rem;">✕</span>'
+  ].join(' ');
+  const app = document.getElementById('app');
+  if(app) app.insertBefore(banner, app.firstChild);
+}
+</script>
+</body>
+</html>

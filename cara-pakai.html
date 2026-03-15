@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cara Pakai — TokoPOS</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&family=Syne:wght@700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0f1e; --panel:#0e1525; --card:#111827; --card2:#1a2235;
+  --border:#1f2d45; --accent:#6366f1; --accent2:#f59e0b; --accent3:#10b981;
+  --danger:#ef4444; --text:#f1f5f9; --muted:#64748b; --muted2:#94a3b8;
+}
+body.light {
+  --bg:#f0f4ff; --panel:#ffffff; --card:#ffffff; --card2:#f4f6fb;
+  --border:#e2e8f0; --text:#0f172a; --muted:#64748b; --muted2:#475569;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--text);line-height:1.7;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:radial-gradient(ellipse 60% 40% at 10% 0%,rgba(99,102,241,.08),transparent 60%),
+             radial-gradient(ellipse 40% 30% at 90% 100%,rgba(16,185,129,.05),transparent 60%);}
+
+/* LAYOUT */
+.wrap{position:relative;z-index:1;max-width:820px;margin:0 auto;padding:40px 20px 80px;}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:40px;flex-wrap:wrap;gap:12px;}
+.back-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;
+  background:var(--card2);border:1.5px solid var(--border);border-radius:50px;
+  text-decoration:none;color:var(--muted2);font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;
+  transition:all .2s;}
+.back-btn:hover{border-color:var(--accent);color:var(--accent);}
+.theme-toggle{background:var(--card2);border:1.5px solid var(--border);border-radius:50px;
+  padding:6px 14px;cursor:pointer;font-family:'Syne',sans-serif;font-size:.72rem;font-weight:700;
+  color:var(--muted);transition:all .2s;display:inline-flex;align-items:center;gap:5px;}
+.theme-toggle:hover{border-color:var(--accent);color:var(--accent);}
+
+/* HERO */
+.hero{text-align:center;margin-bottom:48px;}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;
+  background:rgba(99,102,241,.12);border:1px solid rgba(99,102,241,.25);border-radius:50px;
+  font-size:.72rem;font-weight:700;color:#818cf8;font-family:'Syne',sans-serif;
+  letter-spacing:.5px;margin-bottom:16px;}
+.hero-title{font-family:'Syne',sans-serif;font-size:2.2rem;font-weight:900;margin-bottom:8px;
+  background:linear-gradient(135deg,var(--text),var(--muted2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+body.light .hero-title{background:linear-gradient(135deg,#0f172a,#475569);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
+.hero-sub{color:var(--muted);font-size:.9rem;}
+
+/* INFO TABLE */
+.info-table{width:100%;border:1.5px solid var(--border);border-collapse:collapse;border-radius:14px;overflow:hidden;margin-bottom:32px;}
+.info-table td{padding:10px 16px;font-size:.86rem;border-bottom:1px solid var(--border);}
+.info-table tr:last-child td{border-bottom:none;}
+.info-table td:first-child{font-weight:700;color:var(--muted2);background:var(--card2);width:160px;}
+.info-table td:last-child{color:var(--text);}
+
+/* FILE TABLE */
+.file-table{width:100%;border:1.5px solid var(--border);border-collapse:collapse;border-radius:14px;overflow:hidden;margin-bottom:40px;}
+.file-table th{padding:10px 14px;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:800;
+  letter-spacing:1px;text-transform:uppercase;background:linear-gradient(135deg,#1e1b4b,#312e81);color:#c7d2fe;}
+.file-table td{padding:10px 14px;font-size:.84rem;border-bottom:1px solid var(--border);}
+.file-table tr:last-child td{border-bottom:none;}
+.file-table tr:nth-child(even) td{background:var(--card2);}
+.file-table .filename{font-family:'Space Mono',monospace;color:#818cf8;font-size:.8rem;}
+
+/* SECTIONS */
+.section{margin-bottom:48px;}
+.sec-num{display:inline-flex;align-items:center;justify-content:center;
+  width:32px;height:32px;border-radius:10px;font-family:'Syne',sans-serif;font-size:.85rem;font-weight:900;
+  color:#fff;flex-shrink:0;}
+.sec-header{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.sec-title{font-family:'Syne',sans-serif;font-size:1.3rem;font-weight:900;}
+.sec-desc{color:var(--muted);font-size:.86rem;margin-bottom:20px;padding-left:44px;}
+
+/* SUBSECTION */
+.sub{margin-bottom:20px;}
+.sub-title{font-family:'Syne',sans-serif;font-size:.82rem;font-weight:800;color:var(--muted2);
+  letter-spacing:1.5px;text-transform:uppercase;margin-bottom:10px;
+  display:flex;align-items:center;gap:8px;}
+.sub-title::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* LIST */
+.list{list-style:none;display:flex;flex-direction:column;gap:6px;}
+.list li{display:flex;align-items:flex-start;gap:8px;font-size:.86rem;color:var(--muted2);}
+.list li::before{content:'›';color:var(--accent);font-weight:900;margin-top:1px;flex-shrink:0;}
+.list li strong{color:var(--text);}
+
+/* CALLOUT */
+.callout{display:flex;gap:10px;padding:12px 16px;border-radius:12px;margin:14px 0;font-size:.83rem;line-height:1.6;}
+.callout.tip{background:rgba(99,102,241,.08);border:1px solid rgba(99,102,241,.2);color:#a5b4fc;}
+.callout.warn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.2);color:#fcd34d;}
+.callout.info{background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:#6ee7b7;}
+.callout.danger{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);color:#fca5a5;}
+body.light .callout.tip{color:#4338ca;}
+body.light .callout.warn{color:#92400e;}
+body.light .callout.info{color:#065f46;}
+body.light .callout.danger{color:#991b1b;}
+.callout-icon{font-size:1rem;flex-shrink:0;margin-top:1px;}
+
+/* ROLE BADGE */
+.role-badge{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:50px;
+  font-family:'Syne',sans-serif;font-size:.65rem;font-weight:800;letter-spacing:.5px;}
+.role-owner{background:rgba(99,102,241,.15);border:1px solid rgba(99,102,241,.3);color:#818cf8;}
+.role-admin{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:#fbbf24;}
+.role-kasir{background:rgba(16,185,129,.12);border:1px solid rgba(16,185,129,.25);color:#34d399;}
+
+/* ROLE TABLE */
+.role-table{width:100%;border:1.5px solid var(--border);border-collapse:collapse;border-radius:14px;overflow:hidden;margin:14px 0;}
+.role-table th{padding:8px 12px;font-family:'Syne',sans-serif;font-size:.7rem;font-weight:800;
+  letter-spacing:1px;text-transform:uppercase;background:var(--card2);color:var(--muted);}
+.role-table td{padding:9px 12px;font-size:.82rem;border-top:1px solid var(--border);text-align:center;}
+.role-table td:first-child{text-align:left;color:var(--text);}
+.check{color:#10b981;font-size:.9rem;}
+.cross{color:#ef4444;font-size:.9rem;}
+.partial{color:#f59e0b;font-size:.8rem;font-weight:700;}
+
+/* STEP */
+.steps{display:flex;flex-direction:column;gap:10px;margin:10px 0;}
+.step{display:flex;gap:12px;align-items:flex-start;}
+.step-num{width:24px;height:24px;border-radius:8px;background:linear-gradient(135deg,#4f46e5,var(--accent));
+  color:#fff;font-family:'Syne',sans-serif;font-size:.72rem;font-weight:900;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;}
+.step-text{font-size:.86rem;color:var(--muted2);line-height:1.6;}
+.step-text strong{color:var(--text);}
+
+/* FAQ */
+.faq{display:flex;flex-direction:column;gap:12px;}
+.faq-item{background:var(--card2);border:1.5px solid var(--border);border-radius:14px;overflow:hidden;}
+.faq-q{padding:14px 18px;font-weight:700;font-size:.86rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  transition:background .2s;}
+.faq-q:hover{background:rgba(99,102,241,.05);}
+.faq-q .arrow{color:var(--muted);font-size:.8rem;transition:transform .2s;flex-shrink:0;}
+.faq-a{padding:0 18px;max-height:0;overflow:hidden;transition:all .3s;font-size:.84rem;color:var(--muted2);line-height:1.7;}
+.faq-item.open .faq-a{padding:0 18px 14px;max-height:400px;}
+.faq-item.open .arrow{transform:rotate(90deg);}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:40px 0;}
+
+/* TOC */
+.toc{background:var(--card);border:1.5px solid var(--border);border-radius:18px;padding:20px 24px;margin-bottom:40px;}
+.toc-title{font-family:'Syne',sans-serif;font-size:.72rem;font-weight:800;color:var(--muted);
+  letter-spacing:2px;text-transform:uppercase;margin-bottom:14px;}
+.toc-list{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.toc-item{display:flex;align-items:center;gap:8px;padding:7px 12px;border-radius:10px;
+  text-decoration:none;color:var(--muted2);font-size:.82rem;font-weight:600;transition:all .2s;}
+.toc-item:hover{background:rgba(99,102,241,.08);color:var(--accent);}
+.toc-item .toc-icon{font-size:1rem;}
+@media(max-width:500px){.toc-list{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <a class="back-btn" href="index.html">← Kembali ke Dashboard</a>
+    <button class="theme-toggle" onclick="toggleTheme()" id="themeBtn">🌙 Dark</button>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">📋 PANDUAN LENGKAP</div>
+    <div class="hero-title">Cara Pakai TokoPOS</div>
+    <div class="hero-sub">Sistem kasir & manajemen toko untuk UMKM — offline, tanpa biaya bulanan</div>
+  </div>
+
+  <!-- INFO -->
+  <table class="info-table">
+    <tr><td>Terdiri dari</td><td>7 file HTML (index, toko, kasir, inventory, laporan, pelanggan, cara-pakai)</td></tr>
+    <tr><td>Data tersimpan</td><td>Di browser (localStorage) — tidak perlu internet</td></tr>
+    <tr><td>Cocok untuk</td><td>Toko, warung, kedai, F&B, jasa, dan usaha kecil lainnya</td></tr>
+    <tr><td>Dibuat dengan</td><td>HTML + JavaScript murni, tidak butuh instalasi apapun</td></tr>
+    <tr><td>Browser terbaik</td><td>Google Chrome atau Microsoft Edge (untuk fitur scan barcode)</td></tr>
+  </table>
+
+  <!-- FILE LIST -->
+  <table class="file-table">
+    <tr>
+      <th>File</th><th>Nama</th><th>Fungsi</th>
+    </tr>
+    <tr>
+      <td class="filename">index.html</td>
+      <td>🏠 Dashboard</td>
+      <td>Halaman utama & login — pintu masuk semua aplikasi</td>
+    </tr>
+    <tr>
+      <td class="filename">toko.html</td>
+      <td>⚙️ Pengaturan Toko</td>
+      <td>Setup profil, logo, struk, password akses, backup & restore</td>
+    </tr>
+    <tr>
+      <td class="filename">kasir.html</td>
+      <td>🛒 Kasir</td>
+      <td>Transaksi penjualan, struk, kirim WA, riwayat</td>
+    </tr>
+    <tr>
+      <td class="filename">inventory.html</td>
+      <td>📦 Inventory</td>
+      <td>Kelola stok produk, kategori, mutasi stok, label barcode</td>
+    </tr>
+    <tr>
+      <td class="filename">laporan.html</td>
+      <td>📊 Laporan</td>
+      <td>Laporan keuangan — jurnal, laba rugi, neraca, arus kas</td>
+    </tr>
+    <tr>
+      <td class="filename">pelanggan.html</td>
+      <td>👥 Pelanggan</td>
+      <td>Data pelanggan, blast promo WA, reminder ulang tahun</td>
+    </tr>
+  </table>
+
+  <!-- TOC -->
+  <div class="toc">
+    <div class="toc-title">Daftar Isi</div>
+    <div class="toc-list">
+      <a class="toc-item" href="#sec-mulai"><span class="toc-icon">🚀</span> Mulai Pertama Kali</a>
+      <a class="toc-item" href="#sec-auth"><span class="toc-icon">🔐</span> Sistem Login & Akses</a>
+      <a class="toc-item" href="#sec-toko"><span class="toc-icon">⚙️</span> Pengaturan Toko</a>
+      <a class="toc-item" href="#sec-inventory"><span class="toc-icon">📦</span> Inventory & Stok</a>
+      <a class="toc-item" href="#sec-kasir"><span class="toc-icon">🛒</span> Kasir & Transaksi</a>
+      <a class="toc-item" href="#sec-laporan"><span class="toc-icon">📊</span> Laporan Keuangan</a>
+      <a class="toc-item" href="#sec-pelanggan"><span class="toc-icon">👥</span> Pelanggan & CRM</a>
+      <a class="toc-item" href="#sec-tips"><span class="toc-icon">💡</span> Tips & FAQ</a>
+    </div>
+  </div>
+
+  <!-- ══ 1. MULAI PERTAMA KALI ══ -->
+  <div class="section" id="sec-mulai">
+    <div class="sec-header">
+      <div class="sec-num" style="background:linear-gradient(135deg,#4f46e5,#6366f1);">1</div>
+      <div class="sec-title">Mulai Pertama Kali</div>
+    </div>
+    <div class="sec-desc">Ikuti urutan ini agar semua fitur terhubung dengan benar.</div>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-text"><strong>Taruh semua file dalam 1 folder yang sama</strong> — index.html, toko.html, kasir.html, inventory.html, laporan.html, pelanggan.html, cara-pakai.html harus satu folder.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-text"><strong>Buka toko.html</strong> di browser — isi profil toko, upload logo, setup struk. Ini adalah data dasar yang dipakai semua halaman lain.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-text"><strong>Setup password</strong> di toko.html → tab Profil → card 🔐 Password & Akses. Isi password Owner, Admin, dan Kasir.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">4</div>
+        <div class="step-text"><strong>Input produk</strong> di inventory.html — tambahkan semua produk beserta harga jual, harga modal, dan stok awal.</div>
+      </div>
+      <div class="step">
+        <div class="step-num">5</div>
+        <div class="step-text"><strong>Buka index.html</strong> — login sebagai Owner, semua app sudah siap digunakan.</div>
+      </div>
+    </div>
+
+    <div class="callout tip" style="margin-top:16px;">
+      <span class="callout-icon">💡</span>
+      <span>Isi profil toko sedetail mungkin — nama, alamat, telepon, dan logo akan muncul otomatis di struk, laporan, dan header semua halaman.</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══ 2. SISTEM LOGIN ══ -->
+  <div class="section" id="sec-auth">
+    <div class="sec-header">
+      <div class="sec-num" style="background:linear-gradient(135deg,#7c3aed,#8b5cf6);">2</div>
+      <div class="sec-title">Sistem Login & Akses</div>
+    </div>
+    <div class="sec-desc">TokoPOS memiliki 3 level akses untuk membatasi siapa yang bisa melihat dan mengubah data.</div>
+
+    <div class="sub">
+      <div class="sub-title">3 Role Pengguna</div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:16px;">
+        <div style="background:var(--card2);border:1px solid rgba(99,102,241,.25);border-radius:12px;padding:14px 16px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span class="role-badge role-owner">👑 OWNER</span>
+            <span style="font-size:.8rem;color:var(--muted);">Akses penuh ke semua halaman</span>
+          </div>
+          <div style="font-size:.82rem;color:var(--muted2);">Bisa melihat laporan keuangan, mengubah pengaturan toko, setup password, dan melakukan semua yang bisa dilakukan Admin & Kasir.</div>
+        </div>
+        <div style="background:var(--card2);border:1px solid rgba(245,158,11,.25);border-radius:12px;padding:14px 16px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span class="role-badge role-admin">📋 ADMIN</span>
+            <span style="font-size:.8rem;color:var(--muted);">Input & kelola data</span>
+          </div>
+          <div style="font-size:.82rem;color:var(--muted2);">Bisa akses Inventory (tambah/edit/hapus produk), Pelanggan (tambah/edit/hapus), dan Kasir. Tidak bisa lihat Laporan Keuangan atau ubah Pengaturan Toko.</div>
+        </div>
+        <div style="background:var(--card2);border:1px solid rgba(16,185,129,.25);border-radius:12px;padding:14px 16px;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span class="role-badge role-kasir">🏷️ KASIR</span>
+            <span style="font-size:.8rem;color:var(--muted);">Transaksi saja</span>
+          </div>
+          <div style="font-size:.82rem;color:var(--muted2);">Hanya bisa akses halaman Kasir. Riwayat transaksi hanya tampil untuk hari ini saja. Tidak bisa hapus riwayat, tidak bisa akses halaman lain.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">Tabel Hak Akses</div>
+      <table class="role-table">
+        <tr>
+          <th>Fitur</th>
+          <th>👑 Owner</th>
+          <th>📋 Admin</th>
+          <th>🏷️ Kasir</th>
+        </tr>
+        <tr><td>Dashboard (index.html)</td><td class="check">✅</td><td class="check">✅</td><td class="cross">❌</td></tr>
+        <tr><td>Kasir & Transaksi</td><td class="check">✅</td><td class="check">✅</td><td class="check">✅</td></tr>
+        <tr><td>Riwayat Transaksi</td><td class="check">✅ Semua</td><td class="check">✅ Semua</td><td class="partial">⚡ Hari ini</td></tr>
+        <tr><td>Hapus Riwayat</td><td class="check">✅</td><td class="check">✅</td><td class="cross">❌</td></tr>
+        <tr><td>Inventory</td><td class="check">✅</td><td class="check">✅</td><td class="cross">❌</td></tr>
+        <tr><td>Pelanggan / CRM</td><td class="check">✅</td><td class="check">✅</td><td class="cross">❌</td></tr>
+        <tr><td>Laporan Keuangan</td><td class="check">✅</td><td class="cross">❌</td><td class="cross">❌</td></tr>
+        <tr><td>Pengaturan Toko</td><td class="check">✅</td><td class="cross">❌</td><td class="cross">❌</td></tr>
+        <tr><td>Setup Password</td><td class="check">✅</td><td class="cross">❌</td><td class="cross">❌</td></tr>
+      </table>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">Setup Password</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-text">Buka <strong>toko.html</strong> → tab <strong>Profil Toko</strong> → scroll ke bawah → card <strong>🔐 Password & Akses</strong></div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-text">Isi <strong>Password Owner</strong> (wajib) — minimal 4 karakter, bisa angka/huruf/kombinasi. Contoh: <code style="font-family:'Space Mono',monospace;background:var(--card2);padding:1px 6px;border-radius:4px;font-size:.8rem;">toko2024</code> atau <code style="font-family:'Space Mono',monospace;background:var(--card2);padding:1px 6px;border-radius:4px;font-size:.8rem;">1234</code></div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-text">Isi <strong>Password Admin</strong> + nama admin (opsional). Jika dikosongkan, role Admin tidak aktif.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-text">Isi <strong>Password Kasir</strong> + nama kasir (opsional). Semua password harus berbeda satu sama lain.</div>
+        </div>
+        <div class="step">
+          <div class="step-num">5</div>
+          <div class="step-text">Klik <strong>💾 Simpan Password</strong>. Mulai sekarang setiap buka index.html akan muncul form login.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">Flow Login Sehari-hari</div>
+      <ul class="list">
+        <li>Buka <strong>index.html</strong> → pilih role → masukkan password → tekan Enter atau klik Masuk</li>
+        <li>Login Owner / Admin → masuk ke dashboard, bisa navigasi semua app</li>
+        <li>Login Kasir → langsung redirect ke kasir.html</li>
+        <li>Klik <strong>Keluar</strong> di topbar manapun untuk logout</li>
+        <li>Session aktif selama tab browser tidak ditutup. Buka tab baru = perlu login ulang</li>
+      </ul>
+    </div>
+
+    <div class="callout warn">
+      <span class="callout-icon">⚠️</span>
+      <span>Catat password Owner di tempat yang aman. Jika lupa, bisa dihapus lewat toko.html → Password & Akses → Hapus Password (selama masih login sebagai Owner).</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══ 3. TOKO ══ -->
+  <div class="section" id="sec-toko">
+    <div class="sec-header">
+      <div class="sec-num" style="background:linear-gradient(135deg,#0284c7,#0ea5e9);">3</div>
+      <div class="sec-title">⚙️ Pengaturan Toko</div>
+    </div>
+    <div class="sec-desc">File toko.html adalah pusat konfigurasi. Buka file ini pertama kali sebelum menggunakan yang lain. <span class="role-badge role-owner">👑 Owner only</span></div>
+
+    <div class="sub">
+      <div class="sub-title">Tab Profil Toko</div>
+      <ul class="list">
+        <li>Isi nama toko, jenis usaha, telepon, email, alamat, kota, website/sosmed</li>
+        <li>Upload <strong>logo</strong> (JPG/PNG) — muncul di struk, laporan, dan halaman login</li>
+        <li>Pilih <strong>warna aksen</strong> tema aplikasi</li>
+        <li>Isi modal awal dan kas awal untuk perhitungan laporan</li>
+      </ul>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">Tab Struk & Cetak</div>
+      <ul class="list">
+        <li>Atur teks header struk baris 1 & 2 (default: nama toko & tagline)</li>
+        <li>Atur pesan footer struk (contoh: "Terima kasih sudah berbelanja!")</li>
+        <li>Toggle tampilkan/sembunyikan nomor referensi transaksi</li>
+        <li>Preview tampilan struk secara langsung di sebelah kanan</li>
+      </ul>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">Tab Backup & Restore</div>
+      <ul class="list">
+        <li><strong>Download Backup JSON</strong> — simpan semua data ke file (produk, transaksi, pelanggan)</li>
+        <li><strong>Download CSV</strong> — export data ke format Excel</li>
+        <li><strong>Restore</strong> — pulihkan data dari file JSON backup sebelumnya</li>
+        <li>5 slot <strong>auto-backup</strong> tersimpan otomatis setiap ada perubahan</li>
+      </ul>
+      <div class="callout warn" style="margin-top:10px;">
+        <span class="callout-icon">⚠️</span>
+        <span>Lakukan backup rutin! Data tersimpan di browser — jika cache dihapus atau ganti browser/HP, data bisa hilang.</span>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">Tab Data & Reset</div>
+      <ul class="list">
+        <li>Lihat statistik: jumlah produk, transaksi, pelanggan</li>
+        <li>Reset data secara selektif: hanya transaksi, hanya stok, atau semua</li>
+      </ul>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">🔐 Password & Akses <span class="role-badge role-owner" style="margin-left:6px;">Owner Only</span></div>
+      <ul class="list">
+        <li>Setup password untuk 3 role: Owner, Admin, Kasir</li>
+        <li>Password bebas — angka, huruf, atau kombinasi, minimal 4 karakter</li>
+        <li>Semua password harus berbeda satu sama lain</li>
+        <li>Hapus semua password untuk menonaktifkan sistem login</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══ 4. INVENTORY ══ -->
+  <div class="section" id="sec-inventory">
+    <div class="sec-header">
+      <div class="sec-num" style="background:linear-gradient(135deg,#6366f1,#818cf8);">4</div>
+      <div class="sec-title">📦 Inventory & Stok</div>
+    </div>
+    <div class="sec-desc">Kelola semua produk yang dijual. Data produk terhubung langsung ke Kasir. <span class="role-badge role-owner">👑 Owner</span> <span class="role-badge role-admin" style="margin-left:4px;">📋 Admin</span></div>
+
+    <div class="sub">
+      <div class="sub-title">Tab Stok</div>
+      <ul class="list">
+        <li>Lihat semua produk dalam bentuk kartu dengan info stok</li>
+        <li>Produk dengan stok <strong>di bawah minimum</strong> tampil dengan badge merah otomatis</li>
+        <li>Filter berdasarkan kategori atau cari dengan kolom pencarian</li>
+        <li>Klik kartu produk untuk lihat detail, edit, atau hapus</li>
+      </ul>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">Tab Tambah Item — Field yang Tersedia</div>
+      <table class="info-table">
+        <tr><td>Nama Produk</td><td>Wajib diisi</td></tr>
+        <tr><td>SKU / Barcode</td><td>Opsional — bisa diisi manual atau scan barcode</td></tr>
+        <tr><td>Kategori</td><td>Pilih dari daftar atau buat kategori baru</td></tr>
+        <tr><td>Harga Jual</td><td>Harga yang tampil di kasir saat transaksi</td></tr>
+        <tr><td>Harga Modal</td><td>Untuk perhitungan laba di laporan keuangan</td></tr>
+        <tr><td>Stok Awal</td><td>Jumlah stok saat ini</td></tr>
+        <tr><td>Stok Minimum</td><td>Batas sebelum muncul peringatan stok menipis</td></tr>
+        <tr><td>Satuan</td><td>pcs, kg, liter, dll</td></tr>
+      </table>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">Tab Mutasi Stok</div>
+      <ul class="list">
+        <li>Catat penambahan stok (barang masuk dari supplier)</li>
+        <li>Catat pengurangan stok manual (rusak, hilang, sampel)</li>
+        <li>Setiap mutasi tercatat dengan tanggal dan keterangan</li>
+        <li>Stok otomatis berkurang setiap kali ada transaksi di kasir</li>
+      </ul>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">Tab Label Barcode</div>
+      <ul class="list">
+        <li>Pilih produk dan cetak label harga + barcode</li>
+        <li>Pilih ukuran label (kecil, sedang, besar) dan jumlah cetak</li>
+        <li>Barcode yang tercetak bisa langsung discan di kasir.html</li>
+      </ul>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <span>Klik tombol <strong>↻ Sync</strong> di kasir.html untuk memuat ulang data produk terbaru dari Inventory.</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══ 5. KASIR ══ -->
+  <div class="section" id="sec-kasir">
+    <div class="sec-header">
+      <div class="sec-num" style="background:linear-gradient(135deg,#059669,#10b981);">5</div>
+      <div class="sec-title">🛒 Kasir & Transaksi</div>
+    </div>
+    <div class="sec-desc">Halaman utama untuk melayani pembeli. <span class="role-badge role-owner">👑 Owner</span> <span class="role-badge role-admin" style="margin-left:4px;">📋 Admin</span> <span class="role-badge role-kasir" style="margin-left:4px;">🏷️ Kasir</span></div>
+
+    <div class="sub">
+      <div class="sub-title">Mencari Produk</div>
+      <ul class="list">
+        <li>Ketik nama produk atau SKU di kolom scan atas untuk filter cepat</li>
+        <li>Klik ikon 📷 untuk scan barcode lewat kamera HP atau laptop</li>
+        <li>Filter produk berdasarkan kategori dengan tombol pill di bawah scan bar</li>
+        <li>Klik kartu produk untuk langsung menambahkan ke keranjang</li>
+      </ul>
+      <div class="callout tip" style="margin-top:8px;">
+        <span class="callout-icon">💡</span>
+        <span>Fitur scan barcode bekerja paling baik di <strong>Chrome atau Edge</strong>. Izinkan akses kamera saat diminta. Gunakan <strong>BarcodeDetector API</strong> yang tersedia di Chrome 83+.</span>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">Proses Transaksi</div>
+      <div class="steps">
+        <div class="step"><div class="step-num">1</div><div class="step-text">Klik produk atau scan barcode → produk masuk keranjang</div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-text">Atur jumlah dengan tombol <strong>+</strong> dan <strong>−</strong></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-text">Isi diskon jika ada — bisa dalam <strong>%</strong> atau nominal <strong>Rp</strong>. Tombol cepat 10% dan 20% tersedia.</div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-text">Pilih metode bayar: <strong>💵 Tunai</strong> atau <strong>📲 QRIS</strong></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-text">Jika Tunai, isi jumlah uang diterima — kembalian dihitung otomatis. Klik nominal cepat yang tersedia.</div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-text">Klik <strong>💳 Proses Pembayaran</strong> → struk muncul</div></div>
+      </div>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">Setelah Transaksi — Di Struk</div>
+      <ul class="list">
+        <li><strong>Pilih Pelanggan</strong> dari dropdown agar transaksi tercatat di riwayat pelanggan & segmen otomatis naik</li>
+        <li><strong>🖨️ Print</strong> — cetak struk ke printer thermal atau kertas biasa</li>
+        <li><strong>📲 Kirim WA</strong> — jika pelanggan dipilih & punya nomor WA, langsung buka chat. Jika tidak, teks disalin ke clipboard</li>
+        <li><strong>➕ Transaksi Baru</strong> — reset keranjang untuk transaksi berikutnya</li>
+      </ul>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">Riwayat Transaksi</div>
+      <ul class="list">
+        <li>Klik tombol <strong>📋 Riwayat</strong> di topbar untuk membuka panel riwayat</li>
+        <li><span class="role-badge role-owner">👑</span> <span class="role-badge role-admin" style="margin-left:4px;">📋</span> Bisa lihat semua riwayat + hapus riwayat</li>
+        <li><span class="role-badge role-kasir">🏷️</span> Hanya lihat transaksi hari ini saja, tidak bisa hapus</li>
+        <li>Hapus riwayat <strong>tidak</strong> mempengaruhi data laporan keuangan yang sudah tercatat</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══ 6. LAPORAN ══ -->
+  <div class="section" id="sec-laporan">
+    <div class="sec-header">
+      <div class="sec-num" style="background:linear-gradient(135deg,#d97706,#f59e0b);">6</div>
+      <div class="sec-title">📊 Laporan Keuangan</div>
+    </div>
+    <div class="sec-desc">Laporan keuangan lengkap berbasis data transaksi kasir dan stok inventory. <span class="role-badge role-owner">👑 Owner only</span></div>
+
+    <div class="sub">
+      <div class="sub-title">Tab-tab yang Tersedia</div>
+      <ul class="list">
+        <li><strong>Dashboard</strong> — grafik penjualan harian/mingguan, ringkasan omset, laba, jumlah transaksi, produk terlaris</li>
+        <li><strong>Jurnal Umum</strong> — semua transaksi format double-entry, filter tanggal, export CSV</li>
+        <li><strong>Buku Besar</strong> — ringkasan per akun: saldo awal, mutasi, saldo akhir</li>
+        <li><strong>Laba Rugi</strong> — laporan P&L otomatis, pilih periode bulanan/kuartalan/custom</li>
+        <li><strong>Neraca</strong> — balance sheet sederhana: Aset, Liabilitas, Ekuitas</li>
+        <li><strong>Arus Kas</strong> — cash flow dari aktivitas operasional berdasarkan tanggal aktual</li>
+        <li><strong>Penjualan</strong> — detail semua transaksi dengan filter tanggal & produk, export CSV</li>
+      </ul>
+    </div>
+
+    <div class="callout tip">
+      <span class="callout-icon">💡</span>
+      <span>Semua tab laporan bisa di-export ke <strong>CSV</strong> yang bisa langsung dibuka di Microsoft Excel atau Google Sheets untuk analisis lebih lanjut.</span>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══ 7. PELANGGAN ══ -->
+  <div class="section" id="sec-pelanggan">
+    <div class="sec-header">
+      <div class="sec-num" style="background:linear-gradient(135deg,#be185d,#ec4899);">7</div>
+      <div class="sec-title">👥 Pelanggan & CRM</div>
+    </div>
+    <div class="sec-desc">Kelola hubungan dengan pelanggan: simpan data, kirim promo, ingatkan ulang tahun. <span class="role-badge role-owner">👑 Owner</span> <span class="role-badge role-admin" style="margin-left:4px;">📋 Admin</span></div>
+
+    <div class="sub">
+      <div class="sub-title">Daftar Pelanggan</div>
+      <ul class="list">
+        <li>Tabel semua pelanggan: nama, nomor WA, segmen, total belanja, ulang tahun</li>
+        <li>Filter berdasarkan segmen: <strong>New, Regular, VIP</strong></li>
+        <li>Klik nama pelanggan untuk buka panel detail di sisi kanan</li>
+        <li>Segmen naik otomatis berdasarkan total belanja & jumlah transaksi via kasir</li>
+      </ul>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">Segmentasi Otomatis</div>
+      <table class="info-table">
+        <tr><td>🆕 New</td><td>Pelanggan baru, belum ada riwayat transaksi</td></tr>
+        <tr><td>⭐ Regular</td><td>Total belanja ≥ Rp 200.000 atau sudah 3+ transaksi</td></tr>
+        <tr><td>👑 VIP</td><td>Total belanja ≥ Rp 1.000.000 atau sudah 10+ transaksi</td></tr>
+      </table>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">Blast Promo WA</div>
+      <ul class="list">
+        <li>Buka tab <strong>Blast Promo</strong> → tulis pesan (gunakan <code style="font-family:'Space Mono',monospace;background:var(--card2);padding:1px 5px;border-radius:4px;font-size:.78rem;">{nama}</code> untuk nama otomatis)</li>
+        <li>Filter tujuan berdasarkan segmen (semua, VIP, Regular, New)</li>
+        <li>Centang pelanggan yang akan dikirimi, atau klik ☑️ Pilih Semua</li>
+        <li>Klik 📲 Kirim — WhatsApp terbuka satu per satu ke setiap nomor</li>
+        <li>Status ✅ Terkirim tercatat per pelanggan dalam sesi tersebut</li>
+      </ul>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">Reminder Ulang Tahun</div>
+      <ul class="list">
+        <li>Buka tab <strong>Ulang Tahun</strong> — tampil pelanggan yang ulang tahun hari ini & 7 hari ke depan</li>
+        <li>Centang pelanggan yang akan dikirimi ucapan</li>
+        <li>Klik 📲 Kirim — pesan ucapan otomatis dikirim via WA</li>
+        <li>Notif ulang tahun juga muncul di kasir.html setiap kali halaman dibuka</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- ══ 8. TIPS & FAQ ══ -->
+  <div class="section" id="sec-tips">
+    <div class="sec-header">
+      <div class="sec-num" style="background:linear-gradient(135deg,#0891b2,#06b6d4);">8</div>
+      <div class="sec-title">💡 Tips & FAQ</div>
+    </div>
+    <div class="sec-desc">Pertanyaan yang sering ditanyakan dan tips penggunaan terbaik.</div>
+
+    <div class="sub">
+      <div class="sub-title">Backup yang Disarankan</div>
+      <ul class="list">
+        <li><strong>Setiap minggu</strong> — download backup JSON dari toko.html → Tab Backup & Restore</li>
+        <li><strong>Setiap bulan</strong> — download laporan CSV dari laporan.html</li>
+        <li><strong>Sebelum hapus cache browser</strong> — selalu backup dulu!</li>
+        <li>Simpan file backup di Google Drive atau folder cloud agar aman</li>
+      </ul>
+    </div>
+
+    <div class="sub">
+      <div class="sub-title">FAQ</div>
+      <div class="faq">
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span>Di mana data tersimpan?</span><span class="arrow">›</span>
+          </div>
+          <div class="faq-a">Data tersimpan di <strong>localStorage</strong> browser di komputer/HP yang digunakan. Data tidak dikirim ke server manapun. Karena itu, data hanya ada di browser tersebut — tidak otomatis sinkron ke perangkat lain.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span>Apakah bisa digunakan offline?</span><span class="arrow">›</span>
+          </div>
+          <div class="faq-a">Ya, semua file bisa digunakan tanpa koneksi internet. Internet hanya dibutuhkan untuk memuat font dari Google Fonts saat pertama kali dibuka — setelah itu font ter-cache di browser.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span>Apakah bisa dibuka di HP?</span><span class="arrow">›</span>
+          </div>
+          <div class="faq-a">Ya, semua file sudah responsif untuk HP. Namun untuk kasir dan laporan, <strong>layar yang lebih besar</strong> (tablet atau laptop) lebih nyaman karena banyak data yang ditampilkan secara bersamaan.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span>Data hilang setelah hapus cache browser?</span><span class="arrow">›</span>
+          </div>
+          <div class="faq-a">Ya, data bisa hilang jika cache/storage browser dihapus. Solusinya: lakukan backup rutin lewat <strong>toko.html → Tab Backup & Restore → Download Backup JSON</strong> sebelum hapus cache.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span>Bisa digunakan di beberapa komputer?</span><span class="arrow">›</span>
+          </div>
+          <div class="faq-a">Data tidak sinkron antar perangkat secara otomatis. Untuk pindah data, <strong>export backup JSON</strong> di satu komputer lalu <strong>import/restore</strong> di komputer lain lewat toko.html. Data akan terbaca di semua perangkat yang melakukan restore.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span>Scan barcode tidak berfungsi?</span><span class="arrow">›</span>
+          </div>
+          <div class="faq-a">Pastikan menggunakan <strong>Chrome atau Edge versi terbaru</strong>. Izinkan akses kamera saat diminta browser. Fitur ini menggunakan BarcodeDetector API yang belum tersedia di Firefox atau Safari. Jika tidak bisa, gunakan input manual atau barcode scanner USB.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span>Lupa password Owner?</span><span class="arrow">›</span>
+          </div>
+          <div class="faq-a">Jika masih ada sesi login yang aktif: buka <strong>toko.html → Password & Akses → Hapus Password</strong>. Jika sudah logout semua: buka browser developer tools (F12) → Application → Local Storage → hapus key <code style="font-family:'Space Mono',monospace;font-size:.8rem;">toko_auth_config</code>. Semua password akan hilang dan akses terbuka kembali.</div>
+        </div>
+
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">
+            <span>Kirim WA harus pilih kontak satu-satu?</span><span class="arrow">›</span>
+          </div>
+          <div class="faq-a">Di kasir: jika pelanggan dipilih dari dropdown dan punya nomor WA tersimpan, WA langsung membuka chat ke nomor tersebut. Di pelanggan/blast promo: WA terbuka satu per satu ke setiap nomor yang dicentang — ini adalah limitasi dari WhatsApp, bukan dari aplikasi.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="sub" style="margin-top:24px;">
+      <div class="sub-title">Shortcut Keyboard</div>
+      <table class="info-table">
+        <tr><td>Enter</td><td>Submit form login / konfirmasi</td></tr>
+        <tr><td>Escape</td><td>Tutup modal atau drawer yang terbuka</td></tr>
+        <tr><td>Enter (di kasir)</td><td>Scan/cari produk berdasarkan input</td></tr>
+      </table>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div style="text-align:center;margin-top:48px;padding-top:24px;border-top:1px solid var(--border);
+    font-size:.72rem;color:var(--muted);font-family:'Space Mono',monospace;">
+    TokoPOS — localStorage · Tidak perlu internet · Tidak ada biaya bulanan
+  </div>
+
+</div>
+
+<script>
+function toggleFaq(el){
+  const item = el.parentElement;
+  item.classList.toggle('open');
+}
+
+function toggleTheme(){
+  const isLight = document.body.classList.toggle('light');
+  localStorage.setItem('carapakai_theme', isLight ? 'light' : 'dark');
+  updateThemeBtn(isLight);
+}
+function updateThemeBtn(isLight){
+  const btn = document.getElementById('themeBtn');
+  if(btn) btn.innerHTML = isLight ? '🌙 Dark' : '☀️ Light';
+}
+(function(){
+  const saved = localStorage.getItem('carapakai_theme');
+  if(saved === 'light'){
+    document.body.classList.add('light');
+    updateThemeBtn(true);
+  }
+})();
+
+// Smooth scroll untuk TOC links
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', function(e){
+    e.preventDefault();
+    const target = document.querySelector(this.getAttribute('href'));
+    if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+});
+</script>
+</body>
+</html>
